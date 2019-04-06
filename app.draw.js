@@ -10,7 +10,8 @@ class AppDraw {
 	this.shapes = []
 	this.index = 0;
 	this.app = app;
-
+	this.editIndex = 0;
+	
 	var draw = this;
 
 	document.addEventListener('keydown', function(e){
@@ -58,7 +59,6 @@ class AppDraw {
 	    },
 	    mouseup: event => {
     		if (app.mode !== 'freehand') return;
-    		if (shapes.length < (app.index - 1)) return
     		try {
     		    shapes[draw.index].draw('stop', event);
     		    draw.shapeToCatmullFreehand(shapes[draw.index].node, 2);
@@ -126,11 +126,18 @@ AppDraw.prototype.makePencil = function() {
     var thickness = 0.1;
     var t = thickness / 2;
 
-    shape.moveTo( -t,-t );
-    shape.lineTo( t, -t );
-    shape.lineTo( t, t );
-    shape.lineTo( -t, t );
-    shape.lineTo( -t, -t );
+    // shape.moveTo( -t,-t );
+    // shape.lineTo( t, -t );
+    // shape.lineTo( t, t );
+    // shape.lineTo( -t, t );
+    // shape.lineTo( -t, -t );
+    
+    var shape = new THREE.Shape();
+    shape.moveTo( 0, thickness );
+    shape.quadraticCurveTo( thickness, thickness, thickness, 0 );
+    shape.quadraticCurveTo( thickness, -thickness, 0, -thickness );
+    shape.quadraticCurveTo( -thickness, -thickness, -thickness, 0 );
+    shape.quadraticCurveTo( -thickness, thickness, 0, thickness );
     
     return shape;
 }
@@ -140,9 +147,6 @@ AppDraw.prototype.shapeToCatmullFreehand = function(shape, density){
     var app = this.app;
     var camera = app.camera;
 
-    console.log(camera);
-    console.log("app.canvas");
-    console.log(app.canvas.node.id);
     // var id = makeId(32);
     // shape.setAttribute('id', id);
 
@@ -208,7 +212,7 @@ AppDraw.prototype.shapeToCatmullFreehand = function(shape, density){
     })
 }
 
-AppDraw.prototype.getIntersectingFace = function(p1) {
+AppDraw.prototype.getIntersectingFace = function(p1, all) {
     var m1 = {};
     var p = {};
 
@@ -229,15 +233,56 @@ AppDraw.prototype.getIntersectingFace = function(p1) {
     m1.x =     (p.x) / $(webGLelement).width()  * 2 - 1;
     m1.y = 1 - (p.y) / $(webGLelement).height() * 2;
 
-    console.log('webGLelement width' + $(webGLelement).width());
+    // console.log('webGLelement width' + $(webGLelement).width());
     
     raycaster.setFromCamera( m1, app.camera );
 
+    // console.log(app.scene.children);
+    
     var intersects = raycaster.intersectObjects( app.scene.children, true );
 
     if (intersects.length) {
-	return intersects[0];
+	if (all) {
+	    return intersects;
+	} else {
+	    return intersects[0];
+	}
     } else {
 	return false
+    }
+}
+
+AppDraw.prototype.editLine = function(){
+    var draw = this;
+    var app  = this.app;
+
+    console.log(this.editIndex);
+    var c = app.scene
+	.children
+	.filter(e => {
+	    return e.type == 'Mesh'
+		&& e.userData.svg
+		&& e.userData.camera
+	});
+
+    if (c.length) {
+	if (draw.editIndex >= c.length) {
+	    draw.editIndex = 0;
+	}
+	var i = draw.editIndex;
+	var camera = JSON.parse(c[i].userData.camera)
+	var svg = c[i].userData.svg.replace(/<path /, '<path fill="none" ');
+
+	var loader = new THREE.ObjectLoader();
+
+	loader.parse(camera, function(d){
+	    var n = app.canvas.node
+	    while (n.firstChild) { n.removeChild(n.firstChild) }
+	    
+	    app.camera.copy(d);
+	    app.camera.updateProjectionMatrix();
+	    var s = app.canvas.svg(svg);
+	    draw.editIndex++;
+	})
     }
 }
