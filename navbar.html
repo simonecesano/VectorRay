@@ -1,0 +1,63 @@
+    <style>
+      .navbar-nav li:hover > ul.dropdown-menu {
+	display: block;
+    }
+    .dropdown-submenu {
+	position:relative;
+    }
+    .dropdown-submenu>.dropdown-menu {
+	top:0;
+	left:100%;
+	margin-top:-6px;
+    }
+    </style>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Foobar</a>
+	<div class="collapse navbar-collapse" id="navbarText">
+	  <ul class="navbar-nav mr-auto">
+	    <li class="nav-item dropdown">
+	      <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown"
+		 aria-haspopup="true" aria-expanded="false">View</a>
+	      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+		<a class="dropdown-item" href="#">Top</a>
+		<a class="dropdown-item" href="#">Bottom</a>
+		<a class="dropdown-item" href="#">Right</a>
+		<a class="dropdown-item" href="#">Left</a>
+		<a class="dropdown-item" href="#">Front</a>
+		<a class="dropdown-item" href="#">Back</a>
+		<div class="dropdown-divider"></div>
+		<a class="dropdown-item" href="#">Zoom to fit</a>
+              </div>
+            </li>
+	    <li class="nav-item dropdown">
+	      <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown"
+		 aria-haspopup="true" aria-expanded="false">Edit</a>
+	      <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+		<li><a class="dropdown-item" href="#">Paste vector</a></li>
+		<li><a class="dropdown-item" href="#">Clear</a></li>
+	      </ul>
+	    </li>
+	    <li class="nav-item dropdown">
+	      <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown"
+		 aria-haspopup="true" aria-expanded="false">Mode</a>
+	      <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+		<li><a class="dropdown-item" href="#">3D view</a></li>
+		<div class="dropdown-divider"></div>
+		<li><a class="dropdown-item" href="#">Freehand</a></li>
+		<li><a class="dropdown-item" href="#">Splines</a></li>
+		<li><a class="dropdown-item" href="#">Straight lines</a></li>
+		<div class="dropdown-divider"></div>
+		<li><a class="dropdown-item" href="#">Edit lines</a></li>
+		<!-- <li class="dropdown-submenu" aria-labelledby="navbarDropdown"> -->
+		<!--   <a class="dropdown-item dropdown-toggle" href="http://google.com">Google</a> -->
+		<!--   <ul class="dropdown-menu"> -->
+		<!--     <li> -->
+		<!--     <li><a class="dropdown-item" href="#">3D view</a></li> -->
+		<!--     <li><a class="dropdown-item" href="#">Freehand</a></li> -->
+		<!--   </ul> -->
+		<!-- </li> -->
+	      </ul>
+	    </li>
+	  </ul>
+	</div>
+    </nav>
