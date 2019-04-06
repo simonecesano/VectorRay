@@ -50,15 +50,34 @@ class App {
 	
 	this.$3D.element.addEventListener('drop', app.handleDrop, false)
 	this.$2D.element.addEventListener('drop', app.handleDrop, false)
+
+	var db = new Dexie("vectorbeam");
+	db.version(1).stores({
+		    	objects: 'name,obj',
+		    	colors:  'name,rgba',
+		    	textures: 'name,base64'
+		    });
+	this.db = db;
 	
 	return this;
     };
 
     render() { this.renderer.render( this.scene, this.camera ) }
+
+    load(obj){
+
+    }
+    
     get bbox(){
-	    return new THREE.Box3().setFromObject(this.mesh);
+	return new THREE.Box3().setFromObject(this.mesh);
     }
 
+    get bsphere(){
+	this.mesh.geometry.computeBoundingSphere()
+	return this.mesh.geometry.boundingSphere
+    }
+
+    
     get animate() {
     	var app = this;
     	var f = function animate() { requestAnimationFrame( animate ); app.controls.update(); app.render() }
@@ -73,7 +92,8 @@ class App {
 	    var reader = new FileReader();
 	    
 	    var material = app.defaultMaterial;
-	    
+
+
 	    reader.onload = function(e, clearmeshes, callback) {
 		var geometry, face;
 		try {
@@ -83,6 +103,7 @@ class App {
 		    geometry.traverse(function(child) {
 			if (child instanceof THREE.Mesh) {
 			    child.geometry.computeBoundingBox();
+			    child.geometry.computeBoundingSphere();
 			    child.material = material.clone()
 			} });
 
@@ -97,27 +118,42 @@ class App {
 
 		    var box = new THREE.Box3();
 		    box.setFromCenterAndSize( app.meshCenter(), app.meshSize() );
+		    
 		    var helper = new THREE.Box3Helper( box, 0xff0000 );
-		    // var db = new Dexie("vectorbeam");
-		    // db.version(1).stores({
-		    // 	objects: 'name,obj',
-		    // 	colors:  'name,rgba',
-		    // 	textures: 'name,base64'
-		    // });
-		    // db.objects
-		    // 	.put({name: 'test', obj: obj })
-		    // 	.then(e => {
-		    // 	    return db.objects.get('test')
-		    // 	})
-		    // 	.then(e => {
-		    // 	    console.log(e.obj.length);
-		    // 	}).catch(function(error) {
-		    // 	    alert ("Ooops: " + error);
-		    // 	});
+
 		    
 		    // console.log(obj.length);
 
 		    app.scene.add( app.mesh );
+		    
+		    console.log(app.mesh);
+		    console.log(app.bbox);
+
+		    console.log(app.camera.near);
+		    console.log(app.camera.far);
+		    console.log(app.camera.position);
+		    var r = app.getBoundingSphere().radius;
+
+		    console.log(r);
+		    
+		    app.camera.position.set( 4000, 4000, 4000 );
+		    app.camera.updateProjectionMatrix();
+
+		    console.log(app.camera.position);
+
+		    // console.log(app.getBoundingSphere());
+
+		    app.db.objects
+			.put({name: 'test', obj: obj })
+			.then(e => {
+			    return app.db.objects.get('test')
+			})
+			.then(e => {
+			    console.log(e.obj.length);
+			}).catch(function(error) {
+			    alert ("Ooops: " + error);
+			});
+		    
 		} catch(e) {
 		    console.log(e);
 		};
@@ -176,6 +212,11 @@ App.prototype.getCorners = function() {
 	new THREE.Vector3( bbox.max.x, bbox.max.y, bbox.min.z ), // 110
 	new THREE.Vector3( bbox.max.x, bbox.max.y, bbox.max.z )  // 111
     ];
+}
+
+App.prototype.getBoundingSphere = function() {
+    var points = this.getCorners();
+    return (new THREE.Sphere()).setFromPoints(points)
 }
 
 
@@ -257,4 +298,4 @@ App.prototype.getRenderedImage = function(x, y, width, height){
 
 
 
-class App3D{}
+class App3D {}
