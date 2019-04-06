@@ -86,6 +86,7 @@ var menuActions = {
     },
     '3d view' : function(){
 	app.mode = '3d';
+	app.draw.clearCanvas();
 	
 	console.log('3d');
 	app.controls.enableZoom = true;
@@ -106,10 +107,17 @@ var menuActions = {
 	app.draw.canvas.on('mouseup', app.draw[mode].mouseup);
 	
 	
-	controls.enableZoom = false;
-	controls.enableRotate = false;
-	controls.enablePan = false;		
+	app.controls.enableZoom = false;
+	app.controls.enableRotate = false;
+	app.controls.enablePan = false;		
     },
+    'edit lines' : function(){
+	app.draw.editLine()
+	app.controls.enableZoom = false;
+	app.controls.enableRotate = false;
+	app.controls.enablePan = false;		
+    },
+
 };
 
 var keyBindings = {
@@ -120,13 +128,20 @@ var keyBindings = {
     'm000' : 'bottom',
     'l000' : 'left',
     'r000' : 'right',
+    '3000' : '3d view',
+    
+    'f100' : 'freehand',
+    'p100' : 'polylines',
+    's100' : 'splines',
+
+    'e101' : 'edit lines',
 }; 
 
 $(function(){
     $.get('./navbar.html', function(d) {
 	$('#topmenu').html(d);
 	document.addEventListener("keydown", e => {
-	    if (e.key.match(/^[a-z]{1,1}$/i)) {
+	    if (e.key.match(/^[a-z0-9]{1,1}$/i)) {
 		var k = e.key + [ e.ctrlKey, e.metaKey, e.shiftKey ].map(e => { return e ? 1 : 0 }).join('')
 		if(keyBindings[k] && menuActions[keyBindings[k]]) {
 		    try {
@@ -153,5 +168,13 @@ $(function(){
 		console.log("item ${v} is not connected to an action")
 	    }
 	})
+    })
+
+    $('#canvas').on('click', function(e){
+	console.log(e.clientX, e.clientY);
+	console.log(app.mode);
+	if (app.mode == '3d') {
+	    var o = app.draw.getIntersectingFace(e);
+	}
     })
 })
