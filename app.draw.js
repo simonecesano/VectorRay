@@ -186,15 +186,20 @@ AppDraw.prototype.shapeToCatmullFreehand = function(shape, density){
 	    bevelEnabled: false,
 	    extrudePath: curve
 	};
+
+
 	
 	var geometry = new THREE.ExtrudeGeometry( pencil, extrudeSettings );
 	
 	var color = new THREE.Color("rgb(0, 0, 0)");
 	var material = new THREE.MeshBasicMaterial( { color: color } );
 	var mesh = new THREE.Mesh( geometry, material ) ;
+
+	// console.log(geometry.parameters);
 	
 	mesh.userData.svg = shape.outerHTML;
 	mesh.userData.camera = JSON.stringify(camera);
+	// mesh.userData.curve  = JSON.stringify(curve);
 
 	app.scene.add( mesh );
 	
@@ -252,6 +257,24 @@ AppDraw.prototype.getIntersectingFace = function(p1, all) {
     }
 }
 
+AppDraw.prototype.meshLines = function(){
+    var draw = this;
+    var app  = this.app;
+
+    console.log(this.editIndex);
+    console.log(app.scene.children);
+    
+    var c = app.scene
+	.children
+	.filter(e => {
+	    return e.type == 'Mesh'
+		&& e.userData.svg
+		&& e.userData.camera
+	});
+
+    return c;
+}
+
 AppDraw.prototype.editLine = function(){
     var draw = this;
     var app  = this.app;
@@ -288,4 +311,38 @@ AppDraw.prototype.editLine = function(){
 AppDraw.prototype.clearCanvas = function(){
     var n = this.app.canvas.node;
     while (n.firstChild) { n.removeChild(n.firstChild) }
+}
+
+AppDraw.prototype.vectorize = function() {
+    var draw = this;
+    var app = this.app;
+    var c = this.meshLines();
+
+    c.forEach(e => {
+	var p = e.geometry.parameters.options.extrudePath;
+	var l = p.getLength();
+	var s = 0.5 * 1 / l;
+	var points = []; for (i = 0; i <= 1; i += s) { points.push(i) }; points.push(1)
+
+	points.map(i => {
+	    var v3 = p.getPointAt(i);
+	    return draw.unproject(v3);
+	}).forEach(v2 => {
+	    app.canvas.circle(10).fill('#f06').attr({ cx: v2.x, cy: v2.y });
+	})
+    });
+}
+
+AppDraw.prototype.unproject = function(vector3d) {
+    var app = this.app;
+
+    var v = vector3d.clone();
+
+    v.project( app.camera );
+
+    // map to 2D screen space
+    v.x = Math.round( (   v.x + 1 ) * app.$3D.element.offsetWidth  / 2 );
+    v.y = Math.round( ( - v.y + 1 ) * app.$3D.element.offsetHeight / 2 );
+    v.z = 0;
+    return v;
 }
