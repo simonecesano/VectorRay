@@ -120,6 +120,8 @@ var menuActions = {
 
 };
 
+// ctrlKey, metaKey, shiftKey
+
 var keyBindings = {
     'z000' : 'zoom to fit',
     'f000' : 'front',
@@ -139,6 +141,7 @@ var keyBindings = {
 
 $(function(){
     $.get('./navbar.html', function(d) {
+	console.log('loaded navbar');
 	$('#topmenu').html(d);
 	document.addEventListener("keydown", e => {
 	    if (e.key.match(/^[a-z0-9]{1,1}$/i)) {
