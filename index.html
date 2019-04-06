@@ -32,6 +32,7 @@
 
   <script src="./libs.build.js"></script>
   <script src="./app.draw.js"></script>
+  <script src="./app.fitting.js"></script>
   <script src="./app.js"></script>
   <script src="./app.lights.js"></script>
   <style>
@@ -68,6 +69,12 @@
     function animate() { requestAnimationFrame( animate ); app.controls.update(); app.render() }
     $(function(){
 	app = new App(document.getElementById('webGL'), document.getElementById('canvas') );
+
+	console.log(app.db.objects.get('test')
+		    .then(e => {
+			console.log(e.obj.length )
+			app.load(e.obj, app.defaultMaterial);
+		    }));
 	
 	var frustumSize = 1000;
 	// app.scene.background = new THREE.Color( 0xddeeff );
@@ -77,19 +84,14 @@
 	    frustumSize * app.$3D.aspect / 2,
 	    frustumSize / 2,
 	    frustumSize / - 2,
-	    0.1,
-	    2000
+	    -32000,
+	     32000
 	);
 
 	app.camera.position.set( 100, 100, 100 );
-
-
-	// var pointLight = new THREE.PointLight( 0xaaaaaa );
-	// pointLight.position.set(1,1,2);
-	// app.camera.add(pointLight);
 	app.scene.add(app.camera);
 
-	// app.scene.background = new THREE.Color( 0xddeeff );
+	app.scene.background = new THREE.Color( 0xdddddd );
 
 	app.controls = new THREE.OrbitControls( app.camera );
 
