@@ -271,18 +271,21 @@ AppDraw.prototype.editLine = function(){
 	}
 	var i = draw.editIndex;
 	var camera = JSON.parse(c[i].userData.camera)
-	var svg = c[i].userData.svg.replace(/<path /, '<path fill="none" ');
+	var svg = c[i].userData.svg.replace(/<path /, '<path stroke="DarkRed" fill="none" ');
 
 	var loader = new THREE.ObjectLoader();
 
 	loader.parse(camera, function(d){
-	    var n = app.canvas.node
-	    while (n.firstChild) { n.removeChild(n.firstChild) }
-	    
+	    draw.clearCanvas()
 	    app.camera.copy(d);
 	    app.camera.updateProjectionMatrix();
 	    var s = app.canvas.svg(svg);
 	    draw.editIndex++;
 	})
     }
+}
+
+AppDraw.prototype.clearCanvas = function(){
+    var n = this.app.canvas.node;
+    while (n.firstChild) { n.removeChild(n.firstChild) }
 }
