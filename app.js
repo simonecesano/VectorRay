@@ -10,6 +10,7 @@ class App {
 	webGLElement.appendChild( this.renderer.domElement );
 	
 	this.canvas   = SVG(svgElement.getAttribute('id'));
+
 	this.defaultMaterial = new THREE.MeshPhongMaterial( {
 	    color: 0xcccccc,
 	    specular: 0x111111,
@@ -64,8 +65,31 @@ class App {
 
     render() { this.renderer.render( this.scene, this.camera ) }
 
-    load(obj){
+    load(obj, material){
+	var geometry = app.loader.parse(obj)
 
+	geometry.traverse(function(child) {
+	    if (child instanceof THREE.Mesh) {
+		child.geometry.computeBoundingBox();
+		child.geometry.computeBoundingSphere();
+		child.material = material.clone()
+	    } });
+	
+	geometry.scale.set( 100, 100, 100 );
+	
+	app.mesh = geometry;
+	var t = app.meshCenter();
+	
+	geometry.translateX(-t.x);
+	geometry.translateY(-t.y);
+	geometry.translateZ(-t.z);
+	
+	var box = new THREE.Box3();
+	box.setFromCenterAndSize( app.meshCenter(), app.meshSize() );
+	
+	var helper = new THREE.Box3Helper( box, 0xff0000 );
+	
+	app.scene.add( app.mesh );
     }
     
     get bbox(){
@@ -98,33 +122,8 @@ class App {
 		var geometry, face;
 		try {
 		    var obj = e.target.result;
-		    
-		    geometry = app.loader.parse(obj)
-		    geometry.traverse(function(child) {
-			if (child instanceof THREE.Mesh) {
-			    child.geometry.computeBoundingBox();
-			    child.geometry.computeBoundingSphere();
-			    child.material = material.clone()
-			} });
 
-		    geometry.scale.set( 100, 100, 100 );
-		    
-		    app.mesh = geometry;
-		    var t = app.meshCenter();
-
-		    geometry.translateX(-t.x);
-		    geometry.translateY(-t.y);
-		    geometry.translateZ(-t.z);
-
-		    var box = new THREE.Box3();
-		    box.setFromCenterAndSize( app.meshCenter(), app.meshSize() );
-		    
-		    var helper = new THREE.Box3Helper( box, 0xff0000 );
-
-		    
-		    // console.log(obj.length);
-
-		    app.scene.add( app.mesh );
+		    app.load(obj, material);
 		    
 		    console.log(app.mesh);
 		    console.log(app.bbox);
