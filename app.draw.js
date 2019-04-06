@@ -317,19 +317,23 @@ AppDraw.prototype.vectorize = function() {
     var draw = this;
     var app = this.app;
     var c = this.meshLines();
-
+    
     c.forEach(e => {
 	var p = e.geometry.parameters.options.extrudePath;
 	var l = p.getLength();
 	var s = 0.5 * 1 / l;
 	var points = []; for (i = 0; i <= 1; i += s) { points.push(i) }; points.push(1)
 
-	points.map(i => {
+	points = points.map(i => {
 	    var v3 = p.getPointAt(i);
 	    return draw.unproject(v3);
-	}).forEach(v2 => {
-	    app.canvas.circle(10).fill('#f06').attr({ cx: v2.x, cy: v2.y });
 	})
+
+	// points.forEach(v2 => {
+	//     // app.canvas.circle(10).fill('#f06').attr({ cx: v2.x, cy: v2.y });
+	// })
+
+	draw.drawCatmullRom(points, 0.5);
     });
 }
 
