@@ -117,7 +117,9 @@ var menuActions = {
 	app.controls.enableRotate = false;
 	app.controls.enablePan = false;		
     },
-
+    'vectorize' : function(){
+	app.draw.vectorize()
+    },
 };
 
 // ctrlKey, metaKey, shiftKey
