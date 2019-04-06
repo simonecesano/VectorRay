@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+  <title></title>
+  <script src="./static/jquery-3.3.1.min.js"></script>
+  <link href="./static/font-awesome.min.css" media="screen" rel="stylesheet" type="text/css">
+  
+  <link href="./static/bootstrap.min.css" rel="stylesheet">
+  <script src="./static/popper.js"></script>
+  <script src="./static/bootstrap.min.js"></script>
+
+  <script src="/three.js-master/build/three.js"></script>
+
+  <script src="/three.js-master/examples/js/loaders/OBJLoader.js"></script>
+  <script src="/three.js-master/examples/js/controls/OrbitControls.js"></script>
+
+  <script src="https://code.jquery.com/pep/0.4.1/pep.js"></script>  
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    
+  <script src="./static/FileSaver.js"></script>
+  
+  <script src="./foo.js"></script>
+  <script src="./app.draw.js"></script>
+  <script src="./app.js"></script>
+  <script src="./app.lights.js"></script>
+  <style>
+    #canvas { border: thin solid grey }
+  </style>
+</head>
+
+<body>
+  <div id="topmenu">
+  </div>
+  <div class="container-fluid" style="padding-top:70px">
+    <div class="row" style="height:80vh">
+      <div class="col-1">a vertival menu</div>
+      <div class="col-10" style="height:70vh;position:relative">
+	<div class="" id="webGL" style="width:98%;height:80vh;position: absolute; padding:0;margin:0">
+	</div>
+	<div class="" id="canvas" style="width:98%;height:80vh;position: absolute; padding:0;margin:0">
+	</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2 offset-1"><pre id="bbox_min">bbox</pre></div>
+      <div class="col-2"><pre id="bbox_max">bbox</pre></div>
+      <div class="col-2"><pre id="bbox_center">bbox</pre></div>
+    </div>
+    <div class="row">
+      <div class="col-2 offset-1"><pre id="camera">camera</pre></div>
+      <div class="col-2"><pre id="lookat">lookat</pre></div>
+      <div class="col-2"><pre id="zoom">zoom</pre></div>
+    </div>
+  </div>
+  <script>
+    var app;
+    function animate() { requestAnimationFrame( animate ); app.controls.update(); app.render() }
+    $(function(){
+	app = new App(document.getElementById('webGL'), document.getElementById('canvas') );
+	
+	var frustumSize = 1000;
+	// app.scene.background = new THREE.Color( 0xddeeff );
+	
+	app.camera = new THREE.OrthographicCamera(
+	    frustumSize * app.$3D.aspect / - 2,
+	    frustumSize * app.$3D.aspect / 2,
+	    frustumSize / 2,
+	    frustumSize / - 2,
+	    0.1,
+	    2000
+	);
+
+	app.camera.position.set( 100, 100, 100 );
+
+
+	// var pointLight = new THREE.PointLight( 0xaaaaaa );
+	// pointLight.position.set(1,1,2);
+	// app.camera.add(pointLight);
+	app.scene.add(app.camera);
+
+	// app.scene.background = new THREE.Color( 0xddeeff );
+
+	app.controls = new THREE.OrbitControls( app.camera );
+
+	app.addShadowedLight( 1,   1,  1, 0xffffff, 1 );
+	app.addShadowedLight( -1,  1, -1, 0xffffff, 1 );
+	app.addShadowedLight( 0,  -1, -1, 0xffffff, 1 );
+
+	var geometry = new THREE.SphereGeometry( 5, 32, 32 );
+	var axesHelper = new THREE.AxesHelper( 25 );
+
+
+	app.scene.add(axesHelper);
+
+	
+	app.animate()
+    })
+  </script>
+  <script src="./ui.js"></script>
+</body>
+</html>

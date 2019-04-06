@@ -1,0 +1,243 @@
+const color = "#000000"
+const option = {
+    stroke: "#000000",
+    'stroke-width': 2,
+    'fill-opacity': 0,
+};
+
+class AppDraw {
+    constructor(app){
+	this.shapes = []
+	this.index = 0;
+	this.app = app;
+
+	var draw = this;
+
+	document.addEventListener('keydown', function(e){
+	    if(e.keyCode == 13){
+		draw.shapes[draw.index].draw('done');
+		draw.shapes[draw.index].off('drawstart');
+		
+		if (app.mode === 'splines') {
+		    var points = Array.from(draw.shapes[draw.index].node.points).map(e => { return [e.x, e.y ] });
+		    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		    var attribute = SVGCatmullRomSpline.toPath(points);
+		    path.setAttributeNS(null, 'd', attribute);
+		    draw.shapes[draw.index].node.remove()
+		    draw.shapeToCatmullFreehand(path);
+		} 
+		else if (app.mode === 'polylines') {
+		    draw.shapeToCatmullFreehand(draw.shapes[draw.index].node);
+		} 
+		draw.index++;
+	    }
+	});
+    }
+
+    get freehand(){
+	var draw = this;
+	var app = this.app;
+	var shapes = this.shapes;
+	return {
+	    mousedown: event => {
+    		if (app.mode !== 'freehand') return;
+    		event.stopPropagation();
+    		const shape = app.canvas.polyline().attr(option);
+		console.log(shape);
+		
+		shape.on('drawstart', function(e){ });
+		
+    		shapes[draw.index] = shape;
+    		shape.draw(event);
+	    },
+	    mousemove: event => {
+    		if (app.mode !== 'freehand') return;
+    		// if (!p.ctrlKey) return
+    		if (!shapes[draw.index]) return;
+    		shapes[draw.index].draw('point', event);
+	    },
+	    mouseup: event => {
+    		if (app.mode !== 'freehand') return;
+    		if (shapes.length < (app.index - 1)) return
+    		try {
+    		    shapes[draw.index].draw('stop', event);
+    		    draw.shapeToCatmullFreehand(shapes[draw.index].node, 2);
+    		    draw.index++;
+    		} catch(e) {
+    		    console.log(e);
+    		}
+	    }
+	};
+    }
+    
+
+    get splines(){
+	var draw = this;
+	var app = this.app;
+	var shapes = this.shapes;
+	
+	return {
+	    mousedown: event => {
+    		if (app.mode !== 'splines') return;
+    		// if (!event.ctrlKey) return
+    		event.stopPropagation();
+		if (shapes[draw.index]) {
+		    shapes[draw.index].draw('point', event);
+		} else {
+    		    const shape = app.canvas.polyline().attr(option);
+    		    shapes[draw.index] = shape;
+    		    shape.draw(event);
+		}
+	    },
+	    mouseup: event => {},
+	    mousemove: event => {},
+	}
+    }	
+    get polylines(){
+	var draw = this;
+	var app = this.app;
+	var shapes = this.shapes;
+
+	return {
+	    mousedown: event => {
+    		if (app.mode !== 'polylines') return;
+    		// if (!event.ctrlKey) return
+    		event.stopPropagation();
+		if (shapes[draw.index]) {
+		    shapes[draw.index].draw('point', event);
+		} else {
+    		    const shape = app.canvas.polyline().attr(option);
+    		    shapes[draw.index] = shape;
+    		    shape.draw(event);
+		}
+	    },
+	    mouseup: event => {},
+	    mousemove: event => {},
+	}
+    }
+
+    
+}
+
+
+AppDraw.prototype.makePencil = function() {
+    var shape = new THREE.Shape();
+
+    var thickness = 0.1;
+    var t = thickness / 2;
+
+    shape.moveTo( -t,-t );
+    shape.lineTo( t, -t );
+    shape.lineTo( t, t );
+    shape.lineTo( -t, t );
+    shape.lineTo( -t, -t );
+    
+    return shape;
+}
+
+AppDraw.prototype.shapeToCatmullFreehand = function(shape, density){
+    var draw = this;
+    var app = this.app;
+    var camera = app.camera;
+
+    console.log(camera);
+    console.log("app.canvas");
+    console.log(app.canvas.node.id);
+    // var id = makeId(32);
+    // shape.setAttribute('id', id);
+
+    var totLen = shape.getTotalLength();
+    var segsPerSec = 0.2;
+    var duration = totLen * (1 / segsPerSec);
+
+    console.log(duration);
+    
+    var startTime = new Date();
+    
+    console.log('start ' + (new Date()));
+    console.log('line length ' + shape.getTotalLength());
+    
+    var p = [];
+    for ( i = 0; i < shape.getTotalLength(); i += 2) {
+	var k = shape.getPointAtLength(i);
+	p.push(k);
+    }
+    
+    console.log('start ' + (new Date()));
+    Promise.all(p.map(e => {
+	return (new Promise(function(resolve, reject){
+	    resolve(draw.getIntersectingFace(e))
+	}))
+    })).then( e => {
+	return e.filter(e => {
+	    return e.faceIndex
+	}).map(e => {
+	    return e.point;
+	})
+    }).then( intersections => {
+	var pencil = draw.makePencil()
+	var curve = new THREE.CatmullRomCurve3(intersections);
+	var extrudeSettings = {
+	    steps: shape.getTotalLength() * 2,
+	    bevelEnabled: false,
+	    extrudePath: curve
+	};
+	
+	var geometry = new THREE.ExtrudeGeometry( pencil, extrudeSettings );
+	
+	var color = new THREE.Color("rgb(0, 0, 0)");
+	var material = new THREE.MeshBasicMaterial( { color: color } );
+	var mesh = new THREE.Mesh( geometry, material ) ;
+	
+	mesh.userData.svg = shape.outerHTML;
+	mesh.userData.camera = JSON.stringify(camera);
+
+	app.scene.add( mesh );
+	
+	shape.remove()
+	return mesh
+    }).then(e => {
+	console.log(e);
+	var endTime = new Date();
+
+	console.log('drawn ' + (new Date()));
+	console.log("total time " + (endTime.getTime() - startTime.getTime()));
+	console.log("segments per sec " + (totLen / (endTime.getTime() - startTime.getTime())));
+    }).catch(e => {
+	console.log(e)
+    })
+}
+
+AppDraw.prototype.getIntersectingFace = function(p1) {
+    var m1 = {};
+    var p = {};
+
+    var app = this.app;
+    
+    var webGLelement = app.$3D.element;
+    var raycaster = app.$3D.raycaster;
+
+    if (typeof p1.clientX !== 'undefined') {
+	var r = webGLelement.getBoundingClientRect()
+	p.x = p1.clientX - r.x
+	p.y = p1.clientY - r.y
+    } else {
+	p.x = p1.x
+	p.y = p1.y
+    }
+    
+    m1.x =     (p.x) / $(webGLelement).width()  * 2 - 1;
+    m1.y = 1 - (p.y) / $(webGLelement).height() * 2;
+
+    console.log('webGLelement width' + $(webGLelement).width());
+    
+    raycaster.setFromCamera( m1, app.camera );
+
+    var intersects = raycaster.intersectObjects( app.scene.children, true );
+
+    if (intersects.length) {
+	return intersects[0];
+    } else {
+	return false
+    }
+}
