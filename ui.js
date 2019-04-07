@@ -175,11 +175,21 @@ $(function(){
 	})
     })
 
-    $('#canvas').on('click', function(e){
-	console.log(e.clientX, e.clientY);
-	console.log(app.mode);
-	if (app.mode == '3d') {
-	    var o = app.draw.getIntersectingFace(e);
+    $('#sidemenu img').on('click', function(e) {
+	var v  = $(e.target).data('command')
+	console.log(v);
+	if (menuActions[v]) {
+	    try {
+		menuActions[v]();
+	    } catch(e) {
+		console.log(e)
+	    }
+	} else {
+	    console.log("item ${v} is not connected to an action")
 	}
+    })
+    
+    $('#canvas').on('click', function(e){
+	console.log(e);
     })
 })
