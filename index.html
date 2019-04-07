@@ -37,6 +37,7 @@
   <script src="./app.lights.js"></script>
   <style>
     #canvas { border: thin solid grey }
+    #sidemenu img { display: block; width: 40; height: 40; padding: 4 }
   </style>
 </head>
 
@@ -45,8 +46,14 @@
   </div>
   <div class="container-fluid" style="padding-top:70px">
     <div class="row" style="height:80vh">
-      <div class="col-1">a vertival menu</div>
-      <div class="col-10" style="height:70vh;position:relative">
+      <div class="col-1" id="sidemenu">
+	<img src="/icons/draw-freehand.svg">
+	<img src="/icons/draw-splines.svg">
+	<img src="/icons/draw-polylines.svg">	
+	<img src="/icons/draw-cuboid.svg">
+	<img src="/icons/zoom-fit-selection.svg">	
+      </div>
+      <div class="col-10" style="height:80vh;position:relative">
 	<div class="" id="webGL" style="width:98%;height:80vh;position: absolute; padding:0;margin:0">
 	</div>
 	<div class="" id="canvas" style="width:98%;height:80vh;position: absolute; padding:0;margin:0">
