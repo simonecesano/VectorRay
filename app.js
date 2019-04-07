@@ -65,7 +65,7 @@ class App {
 
     render() { this.renderer.render( this.scene, this.camera ) }
 
-    load(obj, material){
+    load(obj, material, add){
 	var geometry = app.loader.parse(obj)
 
 	geometry.traverse(function(child) {
@@ -88,6 +88,15 @@ class App {
 	box.setFromCenterAndSize( app.meshCenter(), app.meshSize() );
 	
 	var helper = new THREE.Box3Helper( box, 0xff0000 );
+
+	if (!add) {
+	    app.scene.children.filter(e => {
+		return e.type.match(/group|mesh/i)
+	    }).forEach(e => {
+		console.log(e.type, e.id);
+		app.scene.remove(e);
+	    });
+	}
 	
 	app.scene.add( app.mesh );
     }
