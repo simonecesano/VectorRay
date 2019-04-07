@@ -21,6 +21,9 @@
 	  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
 	  crossorigin="anonymous"></script>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.1/bootstrap-slider.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.1/css/bootstrap-slider.min.css" media="screen" />
+  
   <script src="https://threejs.org/build/three.js"></script>
   <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
   <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -38,6 +41,7 @@
   <style>
     #canvas { border: thin solid grey }
     #sidemenu img { display: block; width: 40; height: 40; padding: 4 }
+    #sidemenu img { display: block; width: 36; height: 36; padding: 4 }
   </style>
 </head>
 
@@ -45,18 +49,31 @@
   <div id="topmenu">
   </div>
   <div class="container-fluid" style="padding-top:70px">
-    <div class="row" style="height:80vh">
-      <div class="col-1" id="sidemenu">
-	<img src="/icons/draw-freehand.svg">
-	<img src="/icons/draw-splines.svg">
-	<img src="/icons/draw-polylines.svg">	
-	<img src="/icons/draw-cuboid.svg">
-	<img src="/icons/zoom-fit-selection.svg">	
-      </div>
-      <div class="col-10" style="height:80vh;position:relative">
-	<div class="" id="webGL" style="width:98%;height:80vh;position: absolute; padding:0;margin:0">
+    <div class="row" >
+      <div class="col-12">
+	<div style="height:80vh;width:4vw;display:inline-block" id="sidemenu">
+	  <img data-command="freehand" src="/icons/draw-freehand.svg">
+	  <img data-command="splines" src="/icons/draw-splines.svg">
+	  <img data-command="straight lines" src="/icons/draw-polylines.svg">	
+	  <img data-command="zoom to fit" src="/icons/zoom-fit-selection.svg">
+	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-right.svg"> -->
+	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-back.svg"> -->
+	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-bottom.svg">		   -->
+	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-left.svg"> -->
+	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-front.svg"> -->
+	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-top.svg">		   -->
+
 	</div>
-	<div class="" id="canvas" style="width:98%;height:80vh;position: absolute; padding:0;margin:0">
+	<div style="height:80vh;width:76vw;position:relative;display:inline-block">
+	  <div class="" id="webGL" style="width:100%;height:80vh;position: absolute; padding:0;margin:0">
+	  </div>
+	  <div class="" id="canvas" style="width:100%;height:80vh;position: absolute; padding:0;margin:0">
+	  </div>
+	</div>
+	<div style="height:80vh;width:17vw;position:absolute;top:0;display:inline-block; margin-left:24px">
+	  <div>
+	    <h4>tracing level</h4>
+	  </div>
 	</div>
       </div>
     </div>
@@ -64,11 +81,6 @@
       <div class="col-2 offset-1"><pre id="bbox_min">bbox</pre></div>
       <div class="col-2"><pre id="bbox_max">bbox</pre></div>
       <div class="col-2"><pre id="bbox_center">bbox</pre></div>
-    </div>
-    <div class="row">
-      <div class="col-2 offset-1"><pre id="camera">camera</pre></div>
-      <div class="col-2"><pre id="lookat">lookat</pre></div>
-      <div class="col-2"><pre id="zoom">zoom</pre></div>
     </div>
   </div>
   <script>
