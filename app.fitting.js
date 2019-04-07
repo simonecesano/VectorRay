@@ -1,4 +1,60 @@
+AppDraw.prototype.vectorize = function(distanceTolerance, catmullRomFactor) {
+    var draw = this;
+    var app = this.app;
+    var c = this.meshLines();
+
+    distanceTolerance = distanceTolerance || 0.7;
+    
+    c.forEach(e => {
+	var p = e.geometry.parameters.options.extrudePath;
+	var l = p.getLength();
+	var s = 0.5 * 1 / l;
+	var points = []; for (i = 0; i <= 1; i += s) { points.push(i) }; points.push(1)
+
+	const raycaster = new THREE.Raycaster();
+	const camera = app.camera
+	var v = new THREE.Vector3();
+
+	
+	points = points
+	    .map(e => {
+		var r = { point3D: p.getPointAt(e) }
+		r.pointDistance = camera.position.distanceTo(r.point3D);
+		var v3 = r.point3D.clone();
+		
+		v3.sub(camera.position).normalize();
+		raycaster.set(camera.position, v3);
+
+		const intersections = raycaster.intersectObjects(app.scene.children, true);
+		r.intersectionDistance = intersections[0].distance;
+		return r;
+	    })
+	    .map(r => {
+		var v3 = r.point3D
+		r.point2D = draw.unproject(v3);
+		return r
+	    })
+
+	
+	
+	points.forEach(r => {
+	    var v2 = r.point2D
+	    var d = Math.abs(r.pointDistance - r.intersectionDistance);
+	    if (d <= distanceTolerance) {
+	    	app.canvas.circle(10).fill('#8B0000').attr({ cx: v2.x, cy: v2.y, 'data-distance': d })
+	    } else {
+	    	app.canvas.circle(10).fill('#FF8C00').attr({ cx: v2.x, cy: v2.y, 'data-distance': d })
+	    }
+	})
+	if (points.length) { draw.drawCatmullRom(points.map(e => { return e.point2D }), 0.5) }
+    });
+}
+
+//---------------------------------------------------------------
+// Catmull-Rom fitting algorithm from 
 // https://gist.github.com/nicholaswmin/c2661eb11cad5671d816
+//---------------------------------------------------------------
+
 
 AppDraw.prototype.catmullRomFitting = function (data,alpha) {
     if (alpha == 0 || alpha === undefined) {
