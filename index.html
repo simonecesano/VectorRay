@@ -23,11 +23,9 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.1/bootstrap-slider.min.js"></script>
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.1/css/bootstrap-slider.min.css" media="screen" />
-  
-  <script src="https://threejs.org/build/three.js"></script>
-  <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
-  <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 
+  <script src="./three.min.js"></script>  
+  
   <script src="https://code.jquery.com/pep/0.4.1/pep.js"></script>  
   <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
     
@@ -36,6 +34,7 @@
   <script src="./libs.build.js"></script>
   <script src="./app.draw.js"></script>
   <script src="./app.fitting.js"></script>
+  <script src="./app.export.js"></script>
   <script src="./app.js"></script>
   <script src="./app.lights.js"></script>
   <style>
@@ -56,13 +55,6 @@
 	  <img data-command="splines" src="./icons/draw-splines.svg">
 	  <img data-command="straight lines" src="./icons/draw-polylines.svg">	
 	  <img data-command="zoom to fit" src="./icons/zoom-fit-selection.svg">
-	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-right.svg"> -->
-	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-back.svg"> -->
-	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-bottom.svg">		   -->
-	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-left.svg"> -->
-	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-front.svg"> -->
-	  <!-- <img data-command="zoom to fit" src="/icons/3d-perspective-top.svg">		   -->
-
 	</div>
 	<div style="height:80vh;width:76vw;position:relative;display:inline-block">
 	  <div class="" id="webGL" style="width:100%;height:80vh;position: absolute; padding:0;margin:0">
