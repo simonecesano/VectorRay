@@ -120,6 +120,12 @@ var menuActions = {
     'vectorize' : function(){
 	app.draw.vectorize()
     },
+    'get image' : function(){
+	console.log(app.draw.toCanvas())
+    },
+    'get vector' : function(){
+	console.log(app.draw.toSVG())
+    },
 };
 
 // ctrlKey, metaKey, shiftKey
