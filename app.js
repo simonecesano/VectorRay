@@ -3,7 +3,7 @@ class App {
 	this.router   = new Navigo(null, true, '#');
 	this.scene    = new THREE.Scene();
 
-	this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+	this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true, preserveDrawingBuffer: true } );
 	this.renderer.setPixelRatio( window.devicePixelRatio );
 	this.renderer.setClearColor( 0x000000, 0 )
 	this.renderer.setSize( webGLElement.clientWidth, webGLElement.clientHeight );
