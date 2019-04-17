@@ -41,9 +41,9 @@ AppDraw.prototype.vectorize = function(distanceTolerance, catmullRomFactor) {
 	    var v2 = r.point2D
 	    var d = Math.abs(r.pointDistance - r.intersectionDistance);
 	    if (d <= distanceTolerance) {
-	    	app.canvas.circle(10).fill('#8B0000').attr({ cx: v2.x, cy: v2.y, 'data-distance': d })
+	    	app.canvas.circle(10).fill('#8B0000').attr({ cx: v2.x, cy: v2.y, 'data-distance': d, class: 'vectorize' })
 	    } else {
-	    	app.canvas.circle(10).fill('#FF8C00').attr({ cx: v2.x, cy: v2.y, 'data-distance': d })
+	    	app.canvas.circle(10).fill('#FF8C00').attr({ cx: v2.x, cy: v2.y, 'data-distance': d, class: 'vectorize' })
 	    }
 	})
 	if (points.length) { draw.drawCatmullRom(points.map(e => { return e.point2D }), 0.5) }
@@ -54,9 +54,10 @@ AppDraw.prototype.vectorize = function(distanceTolerance, catmullRomFactor) {
 // Catmull-Rom fitting algorithm from 
 // https://gist.github.com/nicholaswmin/c2661eb11cad5671d816
 //---------------------------------------------------------------
-
+// data is an array of { x: 0, y: 0 } objects 
 
 AppDraw.prototype.catmullRomFitting = function (data,alpha) {
+    console.log(data);
     if (alpha == 0 || alpha === undefined) {
       return false;
     } else {
@@ -119,7 +120,7 @@ AppDraw.prototype.catmullRomFitting = function (data,alpha) {
         d += 'C' + bp1.x + ',' + bp1.y + ' ' + bp2.x + ',' + bp2.y + ' ' + p2.x + ',' + p2.y + ' ';
       }
 
-      return d;
+      return 'M' + d;
     }
 };
 
@@ -130,7 +131,7 @@ AppDraw.prototype.drawCatmullRom = function (data,alpha) {
     var element = app.canvas.path()
 	.attr('stroke', 'DarkRed')
 	.attr('fill', 'none')
-	.attr('d', 'M' + d);
+	.attr('d', d);
 
     return d;
 }
