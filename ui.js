@@ -1,7 +1,6 @@
 var menuActions = {
     'right' : function(){
 	var c = app.meshCenter()
-	console.log(c);
 	app.camera.position.set(-100, 0, -c.z)
 	app.camera.lookAt(c)
 	app.camera.lookAt(0, 0, 0)
@@ -41,7 +40,6 @@ var menuActions = {
     'freehand' : function(){
         app.mode = 'freehand';
         var mode = 'freehand'
-        console.log(mode);
 	
         app.canvas.off('mousedown');
         app.canvas.on('mousedown', app.draw[mode].mousedown);
@@ -86,18 +84,44 @@ var menuActions = {
     },
     '3d view' : function(){
 	app.mode = '3d';
+
 	app.draw.clearCanvas();
+        app.canvas.off('mousedown');
+        app.canvas.off('mousemove');
+        app.canvas.off('mouseup');
+
+        app.mode = 'threed';
+        var mode = 'threed'
 	
-	console.log('3d');
+        app.canvas.on('mousedown', app.draw[mode].mousedown);
+	
+	console.log(app.scene);
 	app.controls.enableZoom = true;
 	app.controls.enableRotate = true;
 	app.controls.enablePan = true;		
 	
     },
+    'camera setup' : function(){
+	app.mode = 'camera';
+
+	app.draw.clearCanvas();
+        app.canvas.off('mousedown');
+        app.canvas.off('mousemove');
+        app.canvas.off('mouseup');
+
+        app.mode = 'camera';
+        var mode = 'camera'
+	
+        app.canvas.on('mousedown', app.draw[mode].mousedown);
+	
+	app.controls.enableZoom = false;
+	app.controls.enableRotate = false;
+	app.controls.enablePan = false;		
+	
+    },
     'polylines' : function(){
 	app.mode = 'polylines';
 	var mode = 'polylines'
-	console.log(mode);
 
 	app.draw.canvas.off('mousedown');
 	app.draw.canvas.on('mousedown', app.draw[mode].mousedown);
@@ -126,6 +150,9 @@ var menuActions = {
     'get vector' : function(){
 	console.log(app.draw.toSVG())
     },
+    'paste vector' : function(){
+	console.log(app.draw.pasteSVG())
+    },
 };
 
 // ctrlKey, metaKey, shiftKey
@@ -148,42 +175,58 @@ var keyBindings = {
 }; 
 
 $(function(){
-    $.get('./navbar.html', function(d) {
-	console.log('loaded navbar');
-	$('#topmenu').html(d);
-	document.addEventListener("keydown", e => {
-	    if (e.key.match(/^[a-z0-9]{1,1}$/i)) {
-		var k = e.key + [ e.ctrlKey, e.metaKey, e.shiftKey ].map(e => { return e ? 1 : 0 }).join('')
-		if(keyBindings[k] && menuActions[keyBindings[k]]) {
+    var components = [
+	{ component: './navbar.html', destination: '#topmenu' },
+	{ component: './cards.html',  destination: '#cards' }
+    ];
+
+    Promise.all(components.map(e => {
+	return $.get(e.component)
+	    .then(function(d){
+		return { component: d, destination: e.destination }
+	    })
+    }))
+	.then(a => {
+	    return a.map(d => {
+		// console.log(d.destination);
+		$(d.destination).html(d.component)
+		return d.destination
+	    })
+	})
+	.then(function(){
+	    document.addEventListener("keydown", e => {
+		if (e.key.match(/^[a-z0-9]{1,1}$/i)) {
+		    var k = e.key + [ e.ctrlKey, e.metaKey, e.shiftKey ].map(e => { return e ? 1 : 0 }).join('')
+		    if(keyBindings[k] && menuActions[keyBindings[k]]) {
+			try {
+			    menuActions[keyBindings[k]]();
+			} catch(e) {
+			    console.log(e)
+			}
+		    } else {
+			
+		    }
+		}
+	    });
+	    
+	    $('#view button, a').on('click', function(e){
+		console.log('click');
+		var v = $(e.target).html().toLowerCase();
+		if (menuActions[v]) {
 		    try {
-			menuActions[keyBindings[k]]();
+		    menuActions[v]();
 		    } catch(e) {
 			console.log(e)
 		    }
 		} else {
-
+		    console.log("item ${v} is not connected to an action")
 		}
-	    }
-	});
-	$('#view button, a').on('click', function(e){
-	    console.log('click');
-	    var v = $(e.target).html().toLowerCase();
-	    console.log(v);
-	    if (menuActions[v]) {
-		try {
-		    menuActions[v]();
-		} catch(e) {
-		    console.log(e)
-		}
-	    } else {
-		console.log("item ${v} is not connected to an action")
-	    }
+	    })
 	})
-    })
+    
 
     $('#sidemenu img').on('click', function(e) {
 	var v  = $(e.target).data('command')
-	console.log(v);
 	if (menuActions[v]) {
 	    try {
 		menuActions[v]();
@@ -194,8 +237,35 @@ $(function(){
 	    console.log("item ${v} is not connected to an action")
 	}
     })
+
+
+    // -------------------------------------------------
+    // drag functionality for positioning of model
+    // factor out and cleanup
+    // -------------------------------------------------
     
-    $('#canvas').on('click', function(e){
-	console.log(e);
+    var isDragging;
+    // $('#canvas')
+    // 	.mousedown(function() {
+    // 	    isDragging = false;
+    // 	})
+    // 	.mousemove(function(e) {
+    // 	    if (!isDragging) {
+    // 		isDragging = e.originalEvent;
+    // 	    }
+    // 	})
+    // 	.mouseup(function(e) {
+    // 	    var wasDragging = isDragging;
+    // 	    console.log(e.originalEvent)
+    // 	    console.log(isDragging)
+    // 	    isDragging = false;
+    // 	});
+    $('#cameraSet').click(e => {
+	var v = new THREE.Vector3;
+	['x', 'y', 'z'].forEach(k => {
+	    $('#camera' + k).val()
+	    v[k] = parseInt($('#camera' + k.toUpperCase()).val())
+	});
+	app.camera.up = v;
     })
 })
