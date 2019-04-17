@@ -1,0 +1,199 @@
+<div class="card m-0 p-0">
+  <div id="camera_settings" class="card-body p-0">
+    <div class="card-header" style="height:3em">
+      <h5 class="card-title" style="font-size:120%;" data-toggle="collapse" data-target="#collapseOne"
+	  aria-expanded="true" aria-controls="collapseOne">Camera adjustment</h5>
+    </div>
+    <div id="collapseOne" class="collapse m-1" aria-labelledby="headingOne" data-parent="#accordion">
+      <div>camera up axis</div>
+      <form class="form-inline">
+	<div class="form-check m-2">
+	  <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpX" value="x">
+	  <label class="form-check-label" for="cameraUp1">X</label>
+	</div>
+	<div class="form-check m-2">
+	  <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpY" value="y">
+	  <label class="form-check-label" for="cameraUp1"> Y</label>
+	</div>
+	<div class="form-check m-2">
+	  <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpZ" value="z" checked>
+	  <label class="form-check-label" for="cameraUp1"> Z</label>
+	</div>
+      </form>
+      <div>axis direction</div>
+      <form class="form-inline">
+	<div class="form-check m-2">
+	  <input class="form-check-input" type="radio" name="cameraInvert" id="cameraNormal" value="1" checked>
+	  <label class="form-check-label" for="cameraUp1"> normal</label>
+	</div>
+	<div class="form-check m-2">
+	  <input class="form-check-input" type="radio" name="cameraInvert" id="cameraInverted" value="-1">
+	  <label class="form-check-label" for="cameraUp1"> inverted</label>
+	</div>
+      </form>
+      <div>camera rotation</div>
+      <form class="form-inline">
+	<div class="form-check m-2">
+	  <input class="form-check-input" type="radio" name="cameraRotation" id="camera90" value="0" checked>
+	  <label class="form-check-label" for="cameraUp1"> 0</label>
+	</div>
+	<div class="form-check m-2">
+	  <input class="form-check-input" type="radio" name="cameraRotation" id="camera90" value="90">
+	  <label class="form-check-label" for="cameraUp1"> 90</label>
+	</div>
+	<div class="form-check m-2">
+	  <input class="form-check-input" type="radio" name="cameraRotation" id="camera90" value="-90">
+	  <label class="form-check-label" for="cameraUp1"> -90</label>
+	</div>
+	<div class="form-check m-2">
+	  <input class="form-check-input" type="radio" name="cameraRotation" id="camera180" value="180">
+	  <label class="form-check-label" for="cameraUp1"> 180</label>
+	</div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- card end -->
+
+<!-- card start -->
+<div class="card m-0 p-0">
+  <div class="card-body p-0"><div class="card-header" style="height:3em">
+      <h5 class="card-title" style="font-size:120%;" data-toggle="collapse" data-target="#collapseTwo"
+	  aria-expanded="true" aria-controls="collapseTwo">Vectorization</h5></div>
+    <div id="collapseTwo" class="collapse m-1" aria-labelledby="headingOne" data-parent="#accordion">
+      <div>near threshold</div>
+      <form class="form-inline">
+	<div style="margin-bottom:12px;margin-top:6px;">
+	  <input style="width:75%" type="range" name="distance" id="distance_range" min="0" max="100"> 
+	  <input style="width:16%;margin-left:6px" class="" id="distance"/>
+	</div>
+	<button type="button" id="vectorize" class="btn btn-primary btn-sm">vectorize</button>&emsp;
+	<button type="button" id="save_svg" class="btn btn-secondary btn-sm">save SVG</button>
+      </form>
+    </div>
+  </div>
+</div>
+<style>
+  div.range {
+    display: flex; flex-flow: row; /* or 'row' and change the order of your html elements */
+    align-items: center;
+    justify-content: flex-start; /* or 'flex-start' and change the order of your html elements */
+    height: 32px;
+  }
+  div.range label { padding-right: 6px; padding-left: 3px }
+</style>
+<div id="object_rotation" class="card m-0 p-0">
+  <div class="card-body p-0"><div class="card-header" style="height:3em">
+      <h5 class="card-title" style="font-size:120%;" data-toggle="collapse" data-target="#collapseThree"
+	  aria-expanded="true" aria-controls="collapseTwo">Object position</h5></div>
+    <div id="collapseThree" class="collapse show m-1" aria-labelledby="headingOne" data-parent="#accordion">
+      <div class="range">
+	<label class="form-check-label" for="rotateX">x axis</label>
+	<input style="thin solid black; width:75%" type="range" id="rotateX" data-axis="x" name="rotateX" min="-180" max="180" step="90">
+      </div>
+      <div class="range">
+	<label class="form-check-label" for="rotateY">y axis</label>
+	<input style="thin solid black; width:75%" type="range" id="rotateY" data-axis="y" name="rotateY" min="-180" max="180" step="90">
+      </div>
+      <div class="range">
+	<label class="form-check-label" for="rotateZ">z axis</label>
+	<input style="thin solid black; width:75%" type="range" id="rotateZ" data-axis="z" name="rotateZ" min="-180" max="180" step="90">
+      </div>
+      <button type="button" class="btn btn-primary btn-sm">recenter</button>&emsp;
+      <button type="button" class="btn btn-secondary btn-sm">zoom to fit</button>
+    </div>
+  </div>
+</div>
+
+<div id="camera_rotation" class="card m-0 p-0">
+  <div class="card-body p-0"><div class="card-header" style="height:3em">
+      <h5 class="card-title" style="font-size:120%;" data-toggle="collapse" data-target="#collapseFour"
+	  aria-expanded="true" aria-controls="collapseTwo">Camera rotation</h5></div>
+    <div id="collapseFour" class="collapse show m-1" aria-labelledby="headingOne" data-parent="#accordion">
+      <div class="range">
+	<label class="form-check-label" for="rotateX">x axis</label>
+	<input style="thin solid black; width:75%" type="range" id="rotateX" data-axis="x" name="rotateX" min="-1" max="1" step="1">
+      </div>
+      <div class="range">
+	<label class="form-check-label" for="rotateY">y axis</label>
+	<input style="thin solid black; width:75%" type="range" id="rotateY" data-axis="y" name="rotateY" min="-1" max="1" step="1">
+      </div>
+      <div class="range">
+	<label class="form-check-label" for="rotateZ">z axis</label>
+	<input style="thin solid black; width:75%" type="range" id="rotateZ" data-axis="z" name="rotateZ" min="-1" max="1" step="1">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- card end -->
+
+
+<script>
+var axes = { x: 0, y: 1, z: 2 }
+$('#camera_rotation input').on('change', function(e) {
+    var up = new THREE.Vector3( 0, 0, 0);
+    $('#camera_rotation input').each((i, e) => {
+	var axis = $(e).data('axis');
+	up.setComponent(axes[axis], parseInt($(e).val()))
+    })
+    console.log(up);
+    app.camera.up = up;
+    app.camera.updateProjectionMatrix()
+})
+
+$('#object_rotation input').on('change', function(e) {
+    var up = new THREE.Vector3( 0, 0, 0);
+    $('#object_rotation input').each((i, e) => {
+	var axis = $(e).data('axis');
+	app.mesh.rotation[axis] = parseInt($(e).val()) * Math.PI / 180;
+    })
+})
+
+
+$('#camera_settings input').on('change', function(e) {
+    var up = new THREE.Vector3( 0, 0, 0);
+    
+    var vals = {
+	rotation: parseInt($('[name="cameraRotation"]:checked').val()),
+	up:       $('[name="cameraUp"]:checked').val(),
+	invert:   parseInt($('[name="cameraInvert"]:checked').val())
+    }
+    up.setComponent(axes[vals.up], vals.invert)
+    app.camera.up = up;
+    app.camera.rotateOnAxis(up, vals.rotation)
+    app.camera.updateProjectionMatrix()
+});
+
+$('#distance_range').on('change', function(e){
+    var circles = $('circle.vectorize').get()
+
+    var distances = circles.map(e => { return $(e).data('distance') })
+    var max_distance = Math.max.apply(null, distances);
+    var distance_tolerance = parseInt($(e.target).val()) / 100 * max_distance;
+
+    
+    console.log(Math.max.apply(null, distances),
+		Math.min.apply(null, distances)) 
+    
+    circles.forEach(e => {
+	var d = $(e).data('distance');
+	if (d <= distance_tolerance) {
+	    e.setAttribute('fill', '#8B0000')
+	} else {
+	    e.setAttribute('fill', '#FF8C00')
+	}
+    })
+})
+
+$('#vectorize').on('click', function(){
+    app.draw.vectorize()
+})
+$('#save_svg').on('click', function(){
+    // app.draw.meshLines().forEach(e => { e.visible = false })
+    $('circle.vectorize').remove()
+    app.draw.toSVG()
+    // app.draw.meshLines().forEach(e => { e.visible = true })
+})
+</script>
