@@ -21,12 +21,7 @@ class App {
 	} );
 
 	this.draw = new AppDraw(this);
-	
-	var manager = new THREE.LoadingManager();
-	manager.onLoad  = function () { console.log( 'Loading complete!') };
-	manager.onError = function () { console.log( 'There was an error loading') };
-	
-	this.loader   = new THREE.OBJLoader(manager);
+	this.loader = new THREE.OBJLoader();
 
 	this.camera = undefined;
 	this.controls;
@@ -97,7 +92,7 @@ class App {
 		app.scene.remove(e);
 	    });
 	}
-	
+	app.zoomToFit();
 	app.scene.add( app.mesh );
     }
     
