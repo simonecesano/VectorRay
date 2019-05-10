@@ -26,9 +26,13 @@ class AppDraw {
 		    var attribute = SVGCatmullRomSpline.toPath(points);
 		    path.setAttributeNS(null, 'd', attribute);
 		    draw.shapes[draw.index].node.remove()
+
+		    console.log(path);
+		    
 		    draw.shapeToCatmullFreehand(path);
 		} 
 		else if (app.mode === 'polylines') {
+		    console.log(draw.shapes[draw.index].node);
 		    draw.shapeToCatmullFreehand(draw.shapes[draw.index].node);
 		} 
 		draw.index++;
@@ -195,27 +199,40 @@ AppDraw.prototype.shapeToCatmullFreehand = function(shape, density){
     // var id = makeId(32);
     // shape.setAttribute('id', id);
 
-    var points = shape.getAttribute('points')
-	.split(/\s+/)
-	.map(e => {
-	    var p = e.split(/\,/)
-	    return { x: p[0], y: p[1] }
-	})
+    //---------------------------------------------
+    // this needs to be only on freehand polylines
+    // this is where polylines are simplified and
+    // and turned into splines
+    //---------------------------------------------
 
-    var d = draw.catmullRomFitting(points, 0.5);
-    
-    var path = new draw.paper.Path(d);
-    console.log(path.exportSVG().getTotalLength());
-    console.log(shape.getTotalLength());
+    if (app.mode === 'freehand' && shape.nodeName === 'polyline') {
+	
+	var points = shape.getAttribute('points')
+	    .split(/\s+/)
+	    .map(e => {
+		var p = e.split(/\,/)
+		return { x: p[0], y: p[1] }
+	    })
+	
+	var d = draw.catmullRomFitting(points, 0.5);
+	
+	var path = new draw.paper.Path(d);
+	console.log(path.exportSVG().getTotalLength());
+	console.log(shape.getTotalLength());
+	
+	// path.simplify()
+	// path.smooth({ type: 'continuous' });
+	path.simplify()
+	console.log(path.exportSVG().getTotalLength());
+	
+	shape.remove()
+	shape = path.exportSVG()
 
-    // path.simplify()
-    // path.smooth({ type: 'continuous' });
-    path.simplify()
-    console.log(path.exportSVG().getTotalLength());
+    }
+    //---------------------------------------------
+    // end of the part that's only for polylines
+    //---------------------------------------------
 
-    shape.remove()
-
-    shape = path.exportSVG()
     
     var totLen = shape.getTotalLength();
     var segsPerSec = 0.2;
