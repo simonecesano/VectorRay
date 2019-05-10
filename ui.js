@@ -1,157 +1,166 @@
 var menuActions = {
-    'right' : function(){
-	var c = app.meshCenter()
-	app.camera.position.set(-100, 0, -c.z)
-	app.camera.lookAt(c)
-	app.camera.lookAt(0, 0, 0)
-	app.camera.updateProjectionMatrix();
-    },
     'left' : function(){
-	var c = app.meshCenter()
-	app.camera.lookAt(c)
-	app.camera.lookAt(0, 0, 0)
-	app.camera.position.set(100, 0, 0)
-	app.camera.updateProjectionMatrix();
+	var c = app.three.meshCenter()
+	app.three.camera.position.set(-100, 0, -c.z)
+	app.three.camera.lookAt(c)
+	app.three.camera.lookAt(0, 0, 0)
+	app.three.camera.updateProjectionMatrix();
+    },
+    'right' : function(){
+	var c = app.three.meshCenter()
+	app.three.camera.lookAt(c)
+	app.three.camera.lookAt(0, 0, 0)
+	app.three.camera.position.set(100, 0, 0)
+	app.three.camera.updateProjectionMatrix();
     },
     'top' : function(){
-	var c = app.meshCenter()
-	app.camera.lookAt(c)
-	app.camera.position.set(c.x, 100, c.z)
+	var c = app.three.meshCenter()
+	app.three.camera.lookAt(c)
+	app.three.camera.position.set(c.x, 100, c.z)
     },
     'bottom' : function(){
-	var c = app.meshCenter()
-	app.camera.lookAt(c)
-	app.camera.rotation.z = 90 * Math.PI / 180
-	app.camera.position.set(c.x, -100, c.z)
+	var c = app.three.meshCenter()
+	app.three.camera.lookAt(c)
+	app.three.camera.rotation.z = 90 * Math.PI / 180
+	app.three.camera.position.set(c.x, -100, c.z)
     },
     'front' : function(){
-	var c = app.meshCenter()
-	app.camera.lookAt(c)
-	app.camera.position.set(c.x, c.y, -100)
+	var c = app.three.meshCenter()
+	app.three.camera.lookAt(c)
+	app.three.camera.position.set(c.x, c.y, -100)
     },
     'back' : function(){
-	var c = app.meshCenter()
-	app.camera.lookAt(c)
-	app.camera.position.set(c.x, c.y, 100)
+	var c = app.three.meshCenter()
+	app.three.camera.lookAt(c)
+	app.three.camera.position.set(c.x, c.y, 100)
     },
     'zoom to fit' : function(){
-	app.zoomToFit(0.9)
+	app.three.zoomToFit(0.9)
     },
     'freehand' : function(){
         app.mode = 'freehand';
         var mode = 'freehand'
 	
-        app.canvas.off('mousedown');
-        app.canvas.on('mousedown', app.draw[mode].mousedown);
-        app.canvas.off('mousemove');
-        app.canvas.on('mousemove', app.draw[mode].mousemove);
-        app.canvas.off('mouseup');
-        app.canvas.on('mouseup', app.draw[mode].mouseup);
+        app.two.canvas.off('mousedown');
+        app.two.canvas.on('mousedown', app.two[mode].mousedown);
+        app.two.canvas.off('mousemove');
+        app.two.canvas.on('mousemove', app.two[mode].mousemove);
+        app.two.canvas.off('mouseup');
+        app.two.canvas.on('mouseup', app.two[mode].mouseup);
         
-        app.controls.enableZoom = false;
-        app.controls.enableRotate = false;
-        app.controls.enablePan = false;             
+        app.three.controls.enableZoom = false;
+        app.three.controls.enableRotate = false;
+        app.three.controls.enablePan = false;             
     },
     'splines' : function(){
         app.mode = 'splines';
         var mode = 'splines'
 	
-        app.canvas.off('mousedown');
-        app.canvas.on('mousedown', app.draw[mode].mousedown);
-        app.canvas.off('mousemove');
-        app.canvas.on('mousemove', app.draw[mode].mousemove);
-        app.canvas.off('mouseup');
-        app.canvas.on('mouseup', app.draw[mode].mouseup);
+        app.two.canvas.off('mousedown');
+        app.two.canvas.on('mousedown', app.two[mode].mousedown);
+        app.two.canvas.off('mousemove');
+        app.two.canvas.on('mousemove', app.two[mode].mousemove);
+        app.two.canvas.off('mouseup');
+        app.two.canvas.on('mouseup', app.two[mode].mouseup);
         
-        app.controls.enableZoom = false;
-        app.controls.enableRotate = false;
-        app.controls.enablePan = false;             
+        app.three.controls.enableZoom = false;
+        app.three.controls.enableRotate = false;
+        app.three.controls.enablePan = false;             
     },
     'straight lines' : function(){
         app.mode = 'polylines';
         var mode = 'polylines'
 	
-        app.canvas.off('mousedown');
-        app.canvas.on('mousedown', app.draw[mode].mousedown);
-        app.canvas.off('mousemove');
-        app.canvas.on('mousemove', app.draw[mode].mousemove);
-        app.canvas.off('mouseup');
-        app.canvas.on('mouseup', app.draw[mode].mouseup);
+        app.two.canvas.off('mousedown');
+        app.two.canvas.on('mousedown', app.two[mode].mousedown);
+        app.two.canvas.off('mousemove');
+        app.two.canvas.on('mousemove', app.two[mode].mousemove);
+        app.two.canvas.off('mouseup');
+        app.two.canvas.on('mouseup', app.two[mode].mouseup);
         
-        app.controls.enableZoom = false;
-        app.controls.enableRotate = false;
-        app.controls.enablePan = false;             
+        app.three.controls.enableZoom = false;
+        app.three.controls.enableRotate = false;
+        app.three.controls.enablePan = false;             
     },
     '3d view' : function(){
 	app.mode = '3d';
 
-	app.draw.clearCanvas();
-        app.canvas.off('mousedown');
-        app.canvas.off('mousemove');
-        app.canvas.off('mouseup');
+	app.two.clearCanvas();
+        app.two.canvas.off('mousedown');
+        app.two.canvas.off('mousemove');
+        app.two.canvas.off('mouseup');
 
         app.mode = 'threed';
         var mode = 'threed'
 	
-        app.canvas.on('mousedown', app.draw[mode].mousedown);
+        // app.two.canvas.on('mousedown', app.two[mode].mousedown);
 	
 	console.log(app.scene);
-	app.controls.enableZoom = true;
-	app.controls.enableRotate = true;
-	app.controls.enablePan = true;		
+	app.three.controls.enableZoom = true;
+	app.three.controls.enableRotate = true;
+	app.three.controls.enablePan = true;		
 	
     },
     'camera setup' : function(){
 	app.mode = 'camera';
 
-	app.draw.clearCanvas();
-        app.canvas.off('mousedown');
-        app.canvas.off('mousemove');
-        app.canvas.off('mouseup');
+	app.two.clearCanvas();
+        app.two.canvas.off('mousedown');
+        app.two.canvas.off('mousemove');
+        app.two.canvas.off('mouseup');
 
         app.mode = 'camera';
         var mode = 'camera'
 	
-        app.canvas.on('mousedown', app.draw[mode].mousedown);
+        app.two.canvas.on('mousedown', app.two[mode].mousedown);
 	
-	app.controls.enableZoom = false;
-	app.controls.enableRotate = false;
-	app.controls.enablePan = false;		
+	app.three.controls.enableZoom = false;
+	app.three.controls.enableRotate = false;
+	app.three.controls.enablePan = false;		
 	
     },
     'polylines' : function(){
 	app.mode = 'polylines';
 	var mode = 'polylines'
 
-	app.draw.canvas.off('mousedown');
-	app.draw.canvas.on('mousedown', app.draw[mode].mousedown);
-	app.draw.canvas.off('mousemove');
-	app.draw.canvas.on('mousemove', app.draw[mode].mousemove);
-	app.draw.canvas.off('mouseup');
-	app.draw.canvas.on('mouseup', app.draw[mode].mouseup);
+	app.two.canvas.off('mousedown');
+	app.two.canvas.on('mousedown', app.two[mode].mousedown);
+	app.two.canvas.off('mousemove');
+	app.two.canvas.on('mousemove', app.two[mode].mousemove);
+	app.two.canvas.off('mouseup');
+	app.two.canvas.on('mouseup', app.two[mode].mouseup);
 	
-	
-	app.controls.enableZoom = false;
-	app.controls.enableRotate = false;
-	app.controls.enablePan = false;		
+	app.three.controls.enableZoom = false;
+	app.three.controls.enableRotate = false;
+	app.three.controls.enablePan = false;		
     },
     'edit lines' : function(){
-	app.draw.editLine()
-	app.controls.enableZoom = false;
-	app.controls.enableRotate = false;
-	app.controls.enablePan = false;		
+	app.two.editLine()
+	app.mode = 'svg';
+	var mode = 'svg'
+
+	app.two.canvas.off('mousedown');
+	app.two.canvas.on('mousedown', app.two[mode].mousedown);
+	app.two.canvas.off('mousemove');
+	app.two.canvas.on('mousemove', app.two[mode].mousemove);
+	app.two.canvas.off('mouseup');
+	app.two.canvas.on('mouseup', app.two[mode].mouseup);
+
+	app.three.controls.enableZoom = false;
+	app.three.controls.enableRotate = false;
+	app.three.controls.enablePan = false;		
     },
     'vectorize' : function(){
-	app.draw.vectorize()
+	app.two.vectorize()
     },
     'get image' : function(){
-	console.log(app.draw.toCanvas())
+	console.log(app.two.toCanvas())
     },
     'get vector' : function(){
-	console.log(app.draw.toSVG())
+	console.log(app.two.toSVG())
     },
     'paste vector' : function(){
-	console.log(app.draw.pasteSVG())
+	console.log(app.two.pasteSVG())
     },
 };
 
@@ -174,18 +183,57 @@ var keyBindings = {
     'e101' : 'edit lines',
 }; 
 
+var setUpDocumentKeyListener = function(){
+    document.addEventListener("keydown", e => {
+	if (e.key.match(/^[a-z0-9]{1,1}$/i)) {
+	    var k = e.key + [ e.ctrlKey, e.metaKey, e.shiftKey ].map(e => { return e ? 1 : 0 }).join('')
+	    if(keyBindings[k] && menuActions[keyBindings[k]]) {
+		try {
+		    menuActions[keyBindings[k]]();
+		} catch(e) {
+		    console.log('key : ' + k);
+		    console.log('binding: ' + keyBindings[k]);
+		    console.log(e)
+		}
+	    } else {
+		
+	    }
+	}
+    });
+}
+
+var setUpDocumentMenuListener = function(){
+    $('a').on('click', function(e){
+	console.log('click');
+	var v = $(e.target).html().toLowerCase();
+	console.log('executing command ' + v);
+	if (menuActions[v]) {
+	    try {
+		console.log('found command ' + v);
+		menuActions[v]();
+	    } catch(e) {
+		console.log(`command  ${v} failed`);
+		console.log(e)
+	    }
+	} else {
+	    console.log(`item ${v} is not connected to an action`)
+	}
+    })
+}
+
 $(function(){
     var components = [
 	{ component: './navbar.html', destination: '#topmenu' },
 	{ component: './cards.html',  destination: '#cards' }
     ];
 
-    Promise.all(components.map(e => {
-	return $.get(e.component)
-	    .then(function(d){
-		return { component: d, destination: e.destination }
-	    })
-    }))
+    Promise
+	.all(components.map(e => {
+	    return $.get(e.component)
+		.then(function(d){
+		    return { component: d, destination: e.destination }
+		})
+	}))
 	.then(a => {
 	    return a.map(d => {
 		// console.log(d.destination);
@@ -194,34 +242,17 @@ $(function(){
 	    })
 	})
 	.then(function(){
-	    document.addEventListener("keydown", e => {
-		if (e.key.match(/^[a-z0-9]{1,1}$/i)) {
-		    var k = e.key + [ e.ctrlKey, e.metaKey, e.shiftKey ].map(e => { return e ? 1 : 0 }).join('')
-		    if(keyBindings[k] && menuActions[keyBindings[k]]) {
-			try {
-			    menuActions[keyBindings[k]]();
-			} catch(e) {
-			    console.log(e)
-			}
-		    } else {
-			
-		    }
-		}
-	    });
-	    
-	    $('#view button, a').on('click', function(e){
-		console.log('click');
-		var v = $(e.target).html().toLowerCase();
-		if (menuActions[v]) {
-		    try {
-		    menuActions[v]();
-		    } catch(e) {
-			console.log(e)
-		    }
-		} else {
-		    console.log("item ${v} is not connected to an action")
-		}
+	    setUpDocumentKeyListener();
+	    setUpDocumentMenuListener();
+
+	    $(document).on('click', 'svg path', function(e){
+		e.stopPropagation();
+		var svg = SVG.adopt($(e.target).get(0));
+		app.two.currentLine = svg;
+		console.log(svg);
+		svg.drawHandles()
 	    })
+	    
 	})
     
 
@@ -230,6 +261,10 @@ $(function(){
 	if (menuActions[v]) {
 	    try {
 		menuActions[v]();
+		if ($(e.target).hasClass('mode')) {
+		    $('#sidemenu img').removeClass('active')
+		    $(e.target).toggleClass('active')
+		}
 	    } catch(e) {
 		console.log(e)
 	    }
@@ -239,33 +274,12 @@ $(function(){
     })
 
 
-    // -------------------------------------------------
-    // drag functionality for positioning of model
-    // factor out and cleanup
-    // -------------------------------------------------
-    
-    var isDragging;
-    // $('#canvas')
-    // 	.mousedown(function() {
-    // 	    isDragging = false;
-    // 	})
-    // 	.mousemove(function(e) {
-    // 	    if (!isDragging) {
-    // 		isDragging = e.originalEvent;
-    // 	    }
-    // 	})
-    // 	.mouseup(function(e) {
-    // 	    var wasDragging = isDragging;
-    // 	    console.log(e.originalEvent)
-    // 	    console.log(isDragging)
-    // 	    isDragging = false;
-    // 	});
     $('#cameraSet').click(e => {
 	var v = new THREE.Vector3;
 	['x', 'y', 'z'].forEach(k => {
 	    $('#camera' + k).val()
 	    v[k] = parseInt($('#camera' + k.toUpperCase()).val())
 	});
-	app.camera.up = v;
+	app.three.camera.up = v;
     })
 })
