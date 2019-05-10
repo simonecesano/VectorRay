@@ -139,15 +139,16 @@ $('#camera_rotation input').on('change', function(e) {
 	up.setComponent(axes[axis], parseInt($(e).val()))
     })
     console.log(up);
-    app.camera.up = up;
-    app.camera.updateProjectionMatrix()
+    app.three.camera.up = up;
+    app.three.camera.updateProjectionMatrix()
 })
 
 $('#object_rotation input').on('change', function(e) {
     var up = new THREE.Vector3( 0, 0, 0);
     $('#object_rotation input').each((i, e) => {
 	var axis = $(e).data('axis');
-	app.mesh.rotation[axis] = parseInt($(e).val()) * Math.PI / 180;
+	app.three.mesh.rotation[axis] = parseInt($(e).val()) * Math.PI / 180;
+	app.three.centerObject();
     })
 })
 
@@ -161,9 +162,9 @@ $('#camera_settings input').on('change', function(e) {
 	invert:   parseInt($('[name="cameraInvert"]:checked').val())
     }
     up.setComponent(axes[vals.up], vals.invert)
-    app.camera.up = up;
-    app.camera.rotateOnAxis(up, vals.rotation)
-    app.camera.updateProjectionMatrix()
+    app.three.camera.up = up;
+    app.three.camera.rotateOnAxis(up, vals.rotation)
+    app.three.camera.updateProjectionMatrix()
 });
 
 $('#distance_range').on('change', function(e){
