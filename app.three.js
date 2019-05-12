@@ -231,6 +231,8 @@ App.Three.prototype.extrusionFromPath = function(shape){
     var draw = this;
     var app = this.app;
     var camera = app.three.camera;
+
+    var matrix = shape.node.getCTM()
     
     var totLen = shape.node.getTotalLength();
     var segsPerSec = 0.2;
@@ -240,10 +242,12 @@ App.Three.prototype.extrusionFromPath = function(shape){
     
     console.log('start ' + (new Date()));
     console.log('line length ' + shape.node.getTotalLength());
-    
+
     var p = [];
     for ( let i = 0; i < shape.node.getTotalLength(); i += 2) {
-	var k = shape.node.getPointAtLength(i);
+	var k = shape.node
+	    .getPointAtLength(i)
+	    .matrixTransform(matrix)
 	p.push(k);
     }
     
