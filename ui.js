@@ -41,12 +41,12 @@ var menuActions = {
         app.mode = 'freehand';
         var mode = 'freehand'
 	
-        app.two.canvas.off('mousedown');
-        app.two.canvas.on('mousedown', app.two[mode].mousedown);
-        app.two.canvas.off('mousemove');
-        app.two.canvas.on('mousemove', app.two[mode].mousemove);
-        app.two.canvas.off('mouseup');
-        app.two.canvas.on('mouseup', app.two[mode].mouseup);
+        app.two.surface.off('mousedown');
+        app.two.surface.on('mousedown', app.two[mode].mousedown);
+        app.two.surface.off('mousemove');
+        app.two.surface.on('mousemove', app.two[mode].mousemove);
+        app.two.surface.off('mouseup');
+        app.two.surface.on('mouseup', app.two[mode].mouseup);
         
         app.three.controls.enableZoom = false;
         app.three.controls.enableRotate = false;
@@ -56,12 +56,12 @@ var menuActions = {
         app.mode = 'splines';
         var mode = 'splines'
 	
-        app.two.canvas.off('mousedown');
-        app.two.canvas.on('mousedown', app.two[mode].mousedown);
-        app.two.canvas.off('mousemove');
-        app.two.canvas.on('mousemove', app.two[mode].mousemove);
-        app.two.canvas.off('mouseup');
-        app.two.canvas.on('mouseup', app.two[mode].mouseup);
+        app.two.surface.off('mousedown');
+        app.two.surface.on('mousedown', app.two[mode].mousedown);
+        app.two.surface.off('mousemove');
+        app.two.surface.on('mousemove', app.two[mode].mousemove);
+        app.two.surface.off('mouseup');
+        app.two.surface.on('mouseup', app.two[mode].mouseup);
         
         app.three.controls.enableZoom = false;
         app.three.controls.enableRotate = false;
@@ -71,12 +71,12 @@ var menuActions = {
         app.mode = 'polylines';
         var mode = 'polylines'
 	
-        app.two.canvas.off('mousedown');
-        app.two.canvas.on('mousedown', app.two[mode].mousedown);
-        app.two.canvas.off('mousemove');
-        app.two.canvas.on('mousemove', app.two[mode].mousemove);
-        app.two.canvas.off('mouseup');
-        app.two.canvas.on('mouseup', app.two[mode].mouseup);
+        app.two.surface.off('mousedown');
+        app.two.surface.on('mousedown', app.two[mode].mousedown);
+        app.two.surface.off('mousemove');
+        app.two.surface.on('mousemove', app.two[mode].mousemove);
+        app.two.surface.off('mouseup');
+        app.two.surface.on('mouseup', app.two[mode].mouseup);
         
         app.three.controls.enableZoom = false;
         app.three.controls.enableRotate = false;
@@ -86,14 +86,14 @@ var menuActions = {
 	app.mode = '3d';
 
 	app.two.clearCanvas();
-        app.two.canvas.off('mousedown');
-        app.two.canvas.off('mousemove');
-        app.two.canvas.off('mouseup');
+        app.two.surface.off('mousedown');
+        app.two.surface.off('mousemove');
+        app.two.surface.off('mouseup');
 
         app.mode = 'threed';
         var mode = 'threed'
 	
-        // app.two.canvas.on('mousedown', app.two[mode].mousedown);
+        // app.two.surface.on('mousedown', app.two[mode].mousedown);
 	
 	console.log(app.scene);
 	app.three.controls.enableZoom = true;
@@ -105,14 +105,14 @@ var menuActions = {
 	app.mode = 'camera';
 
 	app.two.clearCanvas();
-        app.two.canvas.off('mousedown');
-        app.two.canvas.off('mousemove');
-        app.two.canvas.off('mouseup');
+        app.two.surface.off('mousedown');
+        app.two.surface.off('mousemove');
+        app.two.surface.off('mouseup');
 
         app.mode = 'camera';
         var mode = 'camera'
 	
-        app.two.canvas.on('mousedown', app.two[mode].mousedown);
+        app.two.surface.on('mousedown', app.two[mode].mousedown);
 	
 	app.three.controls.enableZoom = false;
 	app.three.controls.enableRotate = false;
@@ -123,12 +123,12 @@ var menuActions = {
 	app.mode = 'polylines';
 	var mode = 'polylines'
 
-	app.two.canvas.off('mousedown');
-	app.two.canvas.on('mousedown', app.two[mode].mousedown);
-	app.two.canvas.off('mousemove');
-	app.two.canvas.on('mousemove', app.two[mode].mousemove);
-	app.two.canvas.off('mouseup');
-	app.two.canvas.on('mouseup', app.two[mode].mouseup);
+	app.two.surface.off('mousedown');
+	app.two.surface.on('mousedown', app.two[mode].mousedown);
+	app.two.surface.off('mousemove');
+	app.two.surface.on('mousemove', app.two[mode].mousemove);
+	app.two.surface.off('mouseup');
+	app.two.surface.on('mouseup', app.two[mode].mouseup);
 	
 	app.three.controls.enableZoom = false;
 	app.three.controls.enableRotate = false;
@@ -139,12 +139,12 @@ var menuActions = {
 	app.mode = 'svg';
 	var mode = 'svg'
 
-	app.two.canvas.off('mousedown');
-	app.two.canvas.on('mousedown', app.two[mode].mousedown);
-	app.two.canvas.off('mousemove');
-	app.two.canvas.on('mousemove', app.two[mode].mousemove);
-	app.two.canvas.off('mouseup');
-	app.two.canvas.on('mouseup', app.two[mode].mouseup);
+	app.two.surface.off('mousedown');
+	app.two.surface.on('mousedown', app.two[mode].mousedown);
+	app.two.surface.off('mousemove');
+	app.two.surface.on('mousemove', app.two[mode].mousemove);
+	app.two.surface.off('mouseup');
+	app.two.surface.on('mouseup', app.two[mode].mouseup);
 
 	app.three.controls.enableZoom = false;
 	app.three.controls.enableRotate = false;
