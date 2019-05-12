@@ -8,9 +8,35 @@ const option = {
 App.Two = class {
     constructor(app, svgElement){
 	this.app = app;
-	this.canvas   = SVG(svgElement.getAttribute('id'));
-	this.element = svgElement
+	// console.log(svgElement);
 
+	this.surface = SVG(svgElement.getAttribute('id'))
+
+	
+	this.surface.attr('viewBox', [0, 0, svgElement.clientWidth, svgElement.clientHeight].join(' '))
+	// console.log(this.canvas.node.outerHTML);
+	// console.log(svgElement.clientWidth, svgElement.clientHeight);
+	// this.canvas.size(svgElement.clientWidth, svgElement.clientHeight);
+	
+	// console.log(this.canvas.node);
+
+	this.element = svgElement
+	this.canvas = this.surface.group()
+
+	this.canvas.rect(40, 40).move(600, 180)
+	this.panZoom = svgPanZoom(this.surface.node,
+				  {
+				      viewportSelector: this.canvas,
+				      haltEventListeners: [],
+				      zoomEnabled: false,
+				      panEnabled: false,
+				      minZoom: 0.001,
+				      maxZoom: 1000
+				  });
+	
+	// console.log(this.panZoom);
+	// console.log(this.surface.node);
+	
 	this.shapes = []
 	this.index = 0;
 	this.app = app;
@@ -215,22 +241,6 @@ App.Two.prototype._getIntersectingFace = function(p1, all) {
     }
 }
 
-App.Two.prototype.meshLines = function(){
-    var draw = this;
-    var app  = this.app;
-
-    // console.log(this.editIndex);
-    
-    var c = app.three.scene
-	.children
-	.filter(e => {
-	    return e.type == 'Mesh'
-		&& e.userData.svg
-		&& e.userData.camera
-	});
-
-    return c;
-}
 
 App.Two.prototype.editLine = function(){
     var draw = this;
@@ -304,3 +314,33 @@ App.Two.prototype.unproject = function(vector3d) {
     return v;
 }
 
+
+App.Two.prototype.drawCatmullRom = function (data,alpha) {
+    var draw = this;
+    var app = this.app;
+
+    console.log(data);
+    
+    var element = this.canvas.path()
+	.fromPoints(data)
+	.attr('stroke', 'DarkRed')
+	.attr('fill', 'none')
+    return element;
+}
+
+App.Two.prototype.zoom = function(z){
+    z = z ? z : this.app.three.camera.zoom / this.app.three.zoomBase;
+    // console.log(this.app.three.zoomBase);
+    // console.log(this.app.three.camera.zoom);
+    this.panZoom.zoom(this.app.three.camera.zoom / this.app.three.zoomBase);
+}
+
+App.Two.prototype.pan = function(d){
+    // console.log('this.app.three.panBase');
+    // console.log(this.app.three.panBase);
+    // console.log('this.app.three.camera.position');
+    // var p = this.app.three.camera.position.clone();
+    // var d = p.sub(this.app.three.panBase);
+    // console.log(d);
+    this.panZoom.panBy(d);
+}
