@@ -30,8 +30,8 @@
     
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paste.js/0.0.21/paste.min.js"></script>
-  <!-- <script src="./libs.build.js"></script> -->
-
+  <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    
   <script src="./libs.build.nopaper.js"></script>
   <script src="./libs.paper.min.js"></script>
   <script src="./svg.catmullRom.js"></script>
@@ -85,8 +85,8 @@
     function animate() { requestAnimationFrame( animate ); app.three.controls.update(); app.three.render() }
 
     $(function(){
+	
 	app = new App(document.getElementById('webGL'), document.getElementById('canvas') );
-	console.log(app);
 
 	var frustumSize = 1000;
 	app.three.camera = new THREE.OrthographicCamera(
@@ -102,7 +102,6 @@
 	app.three.scene.add(app.three.camera);
 
 	app.three.scene.background = new THREE.Color( 0xdddddd );
-
 	app.db.objects.get('obj')
 	    .then(e => {
 		console.log(e);
@@ -121,9 +120,20 @@
 	
 	app.three.controls = new THREE.OrbitControls( app.three.camera, document.getElementById('canvas') );
 
+	var ref = app.two.unproject(new THREE.Vector3(0, 0, 0));
+	
+	app.three.controls.addEventListener( 'change', function(e) {
+	    var curr = app.two.unproject(new THREE.Vector3(0, 0, 0))
+	    var dist = curr.clone().sub(ref)
+	    app.two.zoomAtPoint(app.three.camera.zoom / app.three.zoomBase, curr);
+	    app.two.panBy(dist)
+	    ref = curr;
+	} );
+
 	app.three.addShadowedLight( 1,   1,  1, 0xffffff, 1 );
 	app.three.addShadowedLight( -1,  1, -1, 0xffffff, 1 );
 	app.three.addShadowedLight( 0,  -1, -1, 0xffffff, 1 );
+
 	animate()
     })
   </script>
