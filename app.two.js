@@ -177,7 +177,6 @@ App.Two = class {
 	    mousemove: event => {},
 	}
     }
-
 }
 
 App.Two.prototype.addNode = function(svg) {
@@ -185,61 +184,61 @@ App.Two.prototype.addNode = function(svg) {
     console.log(this.canvas);
 }
 
-App.Two.prototype.makePencil = function() {
-    var shape = new THREE.Shape();
+// App.Two.prototype.makePencil = function() {
+//     var shape = new THREE.Shape();
 
-    var thickness = 0.1;
-    var t = thickness / 2;
+//     var thickness = 0.1;
+//     var t = thickness / 2;
 
-    // shape.moveTo( -t,-t );
-    // shape.lineTo( t, -t );
-    // shape.lineTo( t, t );
-    // shape.lineTo( -t, t );
-    // shape.lineTo( -t, -t );
+//     // shape.moveTo( -t,-t );
+//     // shape.lineTo( t, -t );
+//     // shape.lineTo( t, t );
+//     // shape.lineTo( -t, t );
+//     // shape.lineTo( -t, -t );
     
-    var shape = new THREE.Shape();
-    shape.moveTo( 0, thickness );
-    shape.quadraticCurveTo( thickness, thickness, thickness, 0 );
-    shape.quadraticCurveTo( thickness, -thickness, 0, -thickness );
-    shape.quadraticCurveTo( -thickness, -thickness, -thickness, 0 );
-    shape.quadraticCurveTo( -thickness, thickness, 0, thickness );
+//     var shape = new THREE.Shape();
+//     shape.moveTo( 0, thickness );
+//     shape.quadraticCurveTo( thickness, thickness, thickness, 0 );
+//     shape.quadraticCurveTo( thickness, -thickness, 0, -thickness );
+//     shape.quadraticCurveTo( -thickness, -thickness, -thickness, 0 );
+//     shape.quadraticCurveTo( -thickness, thickness, 0, thickness );
     
-    return shape;
-}
+//     return shape;
+// }
 
-App.Two.prototype._getIntersectingFace = function(p1, all) {
-    var m1 = {};
-    var p = {};
+// App.Two.prototype._getIntersectingFace = function(p1, all) {
+//     var m1 = {};
+//     var p = {};
 
-    var app = this.app;
+//     var app = this.app;
     
-    var webGLelement = app.three.element;
-    var raycaster = app.three.raycaster;
+//     var webGLelement = app.three.element;
+//     var raycaster = app.three.raycaster;
 
-    if (typeof p1.clientX !== 'undefined') {
-	var r = webGLelement.getBoundingClientRect()
-	p.x = p1.clientX - r.x
-	p.y = p1.clientY - r.y
-    } else {
-	p.x = p1.x
-	p.y = p1.y
-    }
+//     if (typeof p1.clientX !== 'undefined') {
+// 	var r = webGLelement.getBoundingClientRect()
+// 	p.x = p1.clientX - r.x
+// 	p.y = p1.clientY - r.y
+//     } else {
+// 	p.x = p1.x
+// 	p.y = p1.y
+//     }
     
-    m1.x =     (p.x) / $(webGLelement).width()  * 2 - 1;
-    m1.y = 1 - (p.y) / $(webGLelement).height() * 2;
-    raycaster.setFromCamera( m1, app.three.camera );
-    var intersects = raycaster.intersectObjects( [ app.three.mesh ], true );
+//     m1.x =     (p.x) / $(webGLelement).width()  * 2 - 1;
+//     m1.y = 1 - (p.y) / $(webGLelement).height() * 2;
+//     raycaster.setFromCamera( m1, app.three.camera );
+//     var intersects = raycaster.intersectObjects( [ app.three.mesh ], true );
 
-    if (intersects.length) {
-	if (all) {
-	    return intersects;
-	} else {
-	    return intersects[0];
-	}
-    } else {
-	return false
-    }
-}
+//     if (intersects.length) {
+// 	if (all) {
+// 	    return intersects;
+// 	} else {
+// 	    return intersects[0];
+// 	}
+//     } else {
+// 	return false
+//     }
+// }
 
 
 App.Two.prototype.editLine = function(){
@@ -328,19 +327,5 @@ App.Two.prototype.drawCatmullRom = function (data,alpha) {
     return element;
 }
 
-App.Two.prototype.zoom = function(z){
-    z = z ? z : this.app.three.camera.zoom / this.app.three.zoomBase;
-    // console.log(this.app.three.zoomBase);
-    // console.log(this.app.three.camera.zoom);
-    this.panZoom.zoom(this.app.three.camera.zoom / this.app.three.zoomBase);
-}
-
-App.Two.prototype.pan = function(d){
-    // console.log('this.app.three.panBase');
-    // console.log(this.app.three.panBase);
-    // console.log('this.app.three.camera.position');
-    // var p = this.app.three.camera.position.clone();
-    // var d = p.sub(this.app.three.panBase);
-    // console.log(d);
-    this.panZoom.panBy(d);
-}
+App.Two.prototype.zoomAtPoint = function(z, p){ this.panZoom.zoomAtPoint(z, p) };
+App.Two.prototype.panBy = function(d){ this.panZoom.panBy(d) };
