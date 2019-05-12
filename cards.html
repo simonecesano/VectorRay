@@ -64,11 +64,12 @@
       <div>near threshold</div>
       <form class="form-inline">
 	<div style="margin-bottom:12px;margin-top:6px;">
-	  <input style="width:75%" type="range" name="distance" id="distance_range" min="0" max="100"> 
-	  <input style="width:16%;margin-left:6px" class="" id="distance"/>
+	  <input style="width:100%" type="range" name="distance" id="distance_range" min="0" max="100"> 
 	</div>
-	<button type="button" id="vectorize" class="btn btn-primary btn-sm">vectorize</button>&emsp;
-	<button type="button" id="save_svg" class="btn btn-secondary btn-sm">save SVG</button>
+	<div>
+	  <button type="button" id="vectorize_test" class="btn btn-primary btn-sm">test</button>&emsp;
+	  <button type="button" id="vectorize_ok" class="btn btn-primary btn-sm">ok</button>&emsp;
+	</div>
       </form>
     </div>
   </div>
@@ -188,13 +189,19 @@ $('#distance_range').on('change', function(e){
     })
 })
 
-$('#vectorize').on('click', function(){
-    app.draw.vectorize()
+$('#vectorize_test').on('click', function(){
+    app.three.vectorize()
 })
+$('#vectorize_ok').on('click', function(){
+    console.log($('circle.vectorize'));
+    $('circle.vectorize').remove()
+    console.log(SVG.adopt($('path').get(0)).drawHandles());
+})
+
 $('#save_svg').on('click', function(){
     // app.draw.meshLines().forEach(e => { e.visible = false })
     $('circle.vectorize').remove()
-    app.draw.toSVG()
+    app.three.toSVG()
     // app.draw.meshLines().forEach(e => { e.visible = true })
 })
 </script>
