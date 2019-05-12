@@ -4,23 +4,23 @@
 //---------------------------------------------------------------
 // data is an array of { x: 0, y: 0 } objects 
 
-var catmullRomFitting = function (polyline, alpha) {
+var catmullRomFitting = function (points, alpha) {
     alpha = alpha ? alpha : 1;
-    data = polyline.array().value.map(p => { return { x: p[0], y: p[1] } });
+    // points = polyline.array().value.map(p => { return { x: p[0], y: p[1] } });
 
     if (alpha == 0 || alpha === undefined) {
 	return false;
     } else {
 	var p0, p1, p2, p3, bp1, bp2, d1, d2, d3, A, B, N, M;
 	var d3powA, d2powA, d3pow2A, d2pow2A, d1pow2A, d1powA;
-	var d = Math.round(data[0].x) + ',' + Math.round(data[0].y) + ' ';
-	var length = data.length;
+	var d = Math.round(points[0].x) + ',' + Math.round(points[0].y) + ' ';
+	var length = points.length;
 	for (var i = 0; i < length - 1; i++) {
 	    
-	    p0 = i == 0 ? data[0] : data[i - 1];
-	    p1 = data[i];
-	    p2 = data[i + 1];
-	    p3 = i + 2 < length ? data[i + 2] : p2;
+	    p0 = i == 0 ? points[0] : points[i - 1];
+	    p1 = points[i];
+	    p2 = points[i + 1];
+	    p3 = i + 2 < length ? points[i + 2] : p2;
 	    
 	    d1 = Math.sqrt(Math.pow(p0.x - p1.x, 2) + Math.pow(p0.y - p1.y, 2));
 	    d2 = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
@@ -188,7 +188,8 @@ function moveControlPoint(bezier, seg, pt, x, y) {
     
     svg_js.extend(svg_js.Polyline, {
 	toCatmullRom: function(alpha){
-	    var d = catmullRomFitting(this, alpha)
+	    var points = this.array().value.map(p => { return { x: p[0], y: p[1] } });
+	    var d = catmullRomFitting(points, alpha)
 	    var r = this.parent().put(new SVG.Path).plot(d);
 	    return r
 	},
@@ -200,7 +201,6 @@ function moveControlPoint(bezier, seg, pt, x, y) {
 	    var path = simplify(this.array().value, tolerance)
 	    this.plot(path);
 	    return this;
-	    // return this.parent().put(new SVG.Polyline).plot(path);
 	},
 	smooth: function(){
 	    var path = smooth(this.array().value)
@@ -222,6 +222,10 @@ function moveControlPoint(bezier, seg, pt, x, y) {
 		drawHandlePoints(g, b, i, t.attr('id'))
 	    })
 	},
+	fromPoints: function(points, alpha){
+	    var d = catmullRomFitting(points, alpha)
+	    return this.plot(d);
+	}
     });
     svg_js.extend(svg_js.Path, {
 	toPaper: function(){
