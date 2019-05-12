@@ -200,6 +200,9 @@ App.Three.prototype.zoomToFit = function(f){
 					    this.element.offsetHeight / (b.max.y - b.min.y)) - 1;
 
 	this.camera.zoom = z * f;
+	this.zoomBase = this.camera.zoom;
+	this.panBase = this.camera.position.clone();
+
 	this.camera.updateProjectionMatrix();
     } else {
     }
@@ -325,4 +328,77 @@ App.Three.prototype.getIntersectingFace = function(p1, all) {
     } else {
 	return false
     }
+}
+
+App.Three.prototype.vectorize = function(distanceTolerance, catmullRomFactor) {
+    var app = this.app;
+    var draw = app.two;
+    var c = this.meshLines();
+
+    distanceTolerance = distanceTolerance || 0.7;
+    
+    c.forEach(e => {
+	var p = e.geometry.parameters.options.extrudePath;
+	var l = p.getLength();
+	var s = 0.5 * 1 / l;
+	var points = []; for (i = 0; i <= 1; i += s) { points.push(i) }; points.push(1)
+
+	const raycaster = new THREE.Raycaster();
+	const camera = app.three.camera
+	var v = new THREE.Vector3();
+
+	
+	points = points
+	    .map(e => {
+		var r = { point3D: p.getPointAt(e) }
+		r.pointDistance = camera.position.distanceTo(r.point3D);
+		var v3 = r.point3D.clone();
+		
+		v3.sub(camera.position).normalize();
+		raycaster.set(camera.position, v3);
+
+		const intersections = raycaster.intersectObjects(app.three.scene.children, true);
+		r.intersectionDistance = intersections[0].distance;
+		return r;
+	    })
+	    .map(r => {
+		var v3 = r.point3D
+		r.point2D = draw.unproject(v3);
+		return r
+	    })
+
+	
+	
+	points.forEach(r => {
+	    var v2 = r.point2D
+	    var d = Math.abs(r.pointDistance - r.intersectionDistance);
+	    if (d <= distanceTolerance) {
+	    	app.two.canvas.circle(10).fill('#8B0000').attr({ cx: v2.x, cy: v2.y, 'data-distance': d, class: 'vectorize' })
+	    } else {
+	    	app.two.canvas.circle(10).fill('#FF8C00').attr({ cx: v2.x, cy: v2.y, 'data-distance': d, class: 'vectorize' })
+	    }
+	})
+
+	if (points.length) {
+	    draw.drawCatmullRom(points.map(e => { return e.point2D }), 0.5)
+		.simplify()
+	}
+    });
+}
+
+App.Three.prototype.meshLines = function(){
+    var draw = this;
+    var app  = this.app;
+
+    // console.log(this.editIndex);
+    
+    var c = app.three.scene
+	.children
+	.filter(e => {
+	    return e.type == 'Mesh'
+		&& e.userData.svg
+		&& e.userData.camera
+	});
+
+    return c;
 }
