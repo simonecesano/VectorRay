@@ -184,62 +184,6 @@ App.Two.prototype.addNode = function(svg) {
     console.log(this.canvas);
 }
 
-// App.Two.prototype.makePencil = function() {
-//     var shape = new THREE.Shape();
-
-//     var thickness = 0.1;
-//     var t = thickness / 2;
-
-//     // shape.moveTo( -t,-t );
-//     // shape.lineTo( t, -t );
-//     // shape.lineTo( t, t );
-//     // shape.lineTo( -t, t );
-//     // shape.lineTo( -t, -t );
-    
-//     var shape = new THREE.Shape();
-//     shape.moveTo( 0, thickness );
-//     shape.quadraticCurveTo( thickness, thickness, thickness, 0 );
-//     shape.quadraticCurveTo( thickness, -thickness, 0, -thickness );
-//     shape.quadraticCurveTo( -thickness, -thickness, -thickness, 0 );
-//     shape.quadraticCurveTo( -thickness, thickness, 0, thickness );
-    
-//     return shape;
-// }
-
-// App.Two.prototype._getIntersectingFace = function(p1, all) {
-//     var m1 = {};
-//     var p = {};
-
-//     var app = this.app;
-    
-//     var webGLelement = app.three.element;
-//     var raycaster = app.three.raycaster;
-
-//     if (typeof p1.clientX !== 'undefined') {
-// 	var r = webGLelement.getBoundingClientRect()
-// 	p.x = p1.clientX - r.x
-// 	p.y = p1.clientY - r.y
-//     } else {
-// 	p.x = p1.x
-// 	p.y = p1.y
-//     }
-    
-//     m1.x =     (p.x) / $(webGLelement).width()  * 2 - 1;
-//     m1.y = 1 - (p.y) / $(webGLelement).height() * 2;
-//     raycaster.setFromCamera( m1, app.three.camera );
-//     var intersects = raycaster.intersectObjects( [ app.three.mesh ], true );
-
-//     if (intersects.length) {
-// 	if (all) {
-// 	    return intersects;
-// 	} else {
-// 	    return intersects[0];
-// 	}
-//     } else {
-// 	return false
-//     }
-// }
-
 
 App.Two.prototype.editLine = function(){
     var draw = this;
@@ -299,17 +243,24 @@ App.Two.prototype.clearCanvas = function(){
 }
 
 
-App.Two.prototype.unproject = function(vector3d) {
+App.Two.prototype.unproject = function(vector3d, transform) {
     var app = this.app;
 
     var v = vector3d.clone();
-
     v.project( app.three.camera );
-
-    // map to 2D screen space
+    
     v.x = Math.round( (   v.x + 1 ) * app.three.element.offsetWidth  / 2 );
     v.y = Math.round( ( - v.y + 1 ) * app.three.element.offsetHeight / 2 );
     v.z = 0;
+
+    if (transform) {
+	var matrix = this.canvas.node.getCTM().inverse()
+	var p = this.surface.node.createSVGPoint()
+	p.x = v.x; p.y = v.y
+	p = p.matrixTransform(matrix)
+	v.x = p.x
+	v.y = p.y
+    }
     return v;
 }
 
