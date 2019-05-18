@@ -134,8 +134,8 @@ var menuActions = {
 	app.three.controls.enableRotate = false;
 	app.three.controls.enablePan = false;		
     },
-    'edit lines' : function(){
-	app.two.editLine()
+    'edit splines' : function(){
+	// app.two.editLine()
 	app.mode = 'svg';
 	var mode = 'svg'
 
@@ -146,9 +146,9 @@ var menuActions = {
 	app.two.surface.off('mouseup');
 	app.two.surface.on('mouseup', app.two[mode].mouseup);
 
-	app.three.controls.enableZoom = false;
+	app.three.controls.enableZoom = true;
 	app.three.controls.enableRotate = false;
-	app.three.controls.enablePan = false;		
+	app.three.controls.enablePan = true;		
     },
     'vectorize' : function(){
 	app.two.vectorize()
