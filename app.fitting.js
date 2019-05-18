@@ -127,8 +127,10 @@ AppDraw.prototype.catmullRomFitting = function (data,alpha) {
 AppDraw.prototype.drawCatmullRom = function (data,alpha) {
     var draw = this;
     var app = this.app;
-    var d = draw.catmullRomFitting(data, alpha);
+
+    console.log(data);
     var element = app.canvas.path()
+	.fromPoints(data);
 	.attr('stroke', 'DarkRed')
 	.attr('fill', 'none')
 	.attr('d', d);
