@@ -64,6 +64,7 @@
 	</div>
 	<div style="height:80vh;width:76vw;position:relative;display:inline-block">
 	  <div class="" id="webGL" style="width:100%;height:80vh;position: absolute; padding:0;margin:0">
+	    <canvas style="width:100%;height:80vh;position: absolute; padding:0;margin:0;display:none"></canvas>
 	  </div>
 	  <div class="" id="canvas" style="width:100%;height:80vh;position: absolute; padding:0;margin:0">
 	    <canvas style="width:100%;height:80vh;position: absolute; padding:0;margin:0;display:none"></canvas>
@@ -85,7 +86,6 @@
     function animate() { requestAnimationFrame( animate ); app.three.controls.update(); app.three.render() }
 
     $(function(){
-	
 	app = new App(document.getElementById('webGL'), document.getElementById('canvas') );
 
 	var frustumSize = 1000;
@@ -104,7 +104,6 @@
 	app.three.scene.background = new THREE.Color( 0xdddddd );
 	app.db.objects.get('obj')
 	    .then(e => {
-		console.log(e);
 		var loader = new THREE.ObjectLoader();
 		var object = loader.parse( e.obj, function(e) {
 		    console.log('loaded');
@@ -123,6 +122,7 @@
 	var ref = app.two.unproject(new THREE.Vector3(0, 0, 0));
 	
 	app.three.controls.addEventListener( 'change', function(e) {
+	    app.three.camera.updateMatrixWorld()
 	    var curr = app.two.unproject(new THREE.Vector3(0, 0, 0))
 	    var dist = curr.clone().sub(ref)
 	    app.two.zoomAtPoint(app.three.camera.zoom / app.three.zoomBase, curr);
