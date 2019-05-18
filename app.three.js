@@ -12,13 +12,31 @@ var makePencil = function(t) {
 App.Three = class {
     constructor(app, webGLElement){
 	this.app = app;
+
+	const canvasEl = (('OffscreenCanvas' in window) && false) ?
+	      webGLElement.querySelector('canvas').transferControlToOffscreen()
+	      : webGLElement.querySelector('canvas');
+
+	// const worker = new Worker('worker.js');
+	// worker.postMessage({ canvas: canvasEl }, [canvasEl]);
+
+	console.log(canvasEl);
+	// console.log(('OffscreenCanvas' in window))
+
+	canvasEl.style = { width: webGLElement.clientWidth, height: webGLElement.clientHeight }
+
+	// const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+
 	this.scene    = new THREE.Scene();
-	this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true, preserveDrawingBuffer: true } );
+
+	this.renderer = new THREE.WebGLRenderer( { canvas: canvasEl, antialias: true, alpha: true, preserveDrawingBuffer: true } );
+
 	this.renderer.setPixelRatio( window.devicePixelRatio );
 	this.renderer.setClearColor( 0x000000, 0 )
 	this.renderer.setSize( webGLElement.clientWidth, webGLElement.clientHeight );
 
-	webGLElement.appendChild( this.renderer.domElement );
+	
+	// webGLElement.appendChild( this.renderer.domElement );
 
 	this.defaultMaterial = new THREE.MeshPhongMaterial( {
 	    color: 0xcccccc,
@@ -339,6 +357,8 @@ App.Three.prototype.vectorize = function(distanceTolerance, catmullRomFactor) {
     var draw = app.two;
     var c = this.meshLines();
 
+
+    
     distanceTolerance = distanceTolerance || 0.7;
     
     c.forEach(e => {
@@ -367,7 +387,7 @@ App.Three.prototype.vectorize = function(distanceTolerance, catmullRomFactor) {
 	    })
 	    .map(r => {
 		var v3 = r.point3D
-		r.point2D = draw.unproject(v3);
+		r.point2D = draw.unproject(v3, true);
 		return r
 	    })
 
