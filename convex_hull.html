@@ -1,0 +1,67 @@
+<div id="convex_hull" class="card m-0 p-0">
+  <div class="card-body p-0"><div class="card-header" style="height:3em">
+      <h5 class="card-title" style="font-size:120%;" data-toggle="collapse" data-target="#collapse_convex_hull"
+	  aria-expanded="true" aria-controls="collapse_convex_hull">Convex Hull</h5></div>
+    <div id="collapse_convex_hull" class="collapse m-1" aria-labelledby="headingOne" data-parent="#accordion">
+      <div>
+	<div class="range">
+	  <label class="form-check-label" for="points">points</label>
+	  <input style="thin solid black; width:75%" type="range" id="points" data-axis="x" value="20" name="rotateX" min="10" max="200" step="10">
+	</div>
+	<div>sampling axis</div>
+	<form class="form-inline">
+	  <div class="form-check m-2">
+	    <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpX" value="x">
+	    <label class="form-check-label" for="cameraUp1">X</label>
+	  </div>
+	  <div class="form-check m-2">
+	    <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpY" value="y">
+	    <label class="form-check-label" for="cameraUp1"> Y</label>
+	  </div>
+	  <div class="form-check m-2">
+	    <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpZ" value="z" checked>
+	    <label class="form-check-label" for="cameraUp1"> Z</label>
+	  </div>
+	</form>
+	<div>hull axis</div>
+	<form class="form-inline">
+	  <div class="form-check m-2">
+	    <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpX" value="x">
+	    <label class="form-check-label" for="cameraUp1">X</label>
+	  </div>
+	  <div class="form-check m-2">
+	    <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpY" value="y">
+	    <label class="form-check-label" for="cameraUp1"> Y</label>
+	  </div>
+	  <div class="form-check m-2">
+	    <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpZ" value="z" checked>
+	    <label class="form-check-label" for="cameraUp1"> Z</label>
+	  </div>
+	</form>
+	<div>hull type</div>
+	<form class="form-inline">
+	  <div class="form-check m-2">
+	    <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpX" value="x">
+	    <label class="form-check-label" for="cameraUp1"> top</label>
+	  </div>
+	  <div class="form-check m-2">
+	    <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpY" value="y">
+	    <label class="form-check-label" for="cameraUp1"> bottom</label>
+	  </div>
+	  <div class="form-check m-2">
+	    <input class="form-check-input" type="radio" name="cameraUp" id="cameraUpZ" value="z" checked>
+	    <label class="form-check-label" for="cameraUp1"> both</label>
+	  </div>
+	</form>
+	<button type="button" id="change_profile" class="btn btn-primary btn-sm">Change profile</button>
+	<button type="button" id="create_convex_hull" class="btn btn-primary btn-sm">Create hull</button><br />
+	<button type="button" id="simplify" class="btn btn-primary btn-sm">Simplify</button>
+	<button type="button" id="melt" class="btn btn-primary btn-sm">Melt</button>
+	<button type="button" id="slice" class="btn btn-primary btn-sm">Slice</button>
+	<button type="button" id="csg" class="btn btn-primary btn-sm">Subtract</button>
+	<button type="button" id="section" class="btn btn-primary btn-sm">Cross-section</button>
+	<br />
+      </div>
+    </div>
+  </div>
+</div>
