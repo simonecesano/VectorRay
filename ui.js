@@ -1,3 +1,24 @@
+// mouse              control
+// move up down click zoom rotate pan 
+
+var setMode = function(app, settings) {
+    console.log(app);
+    ['mousedown', 'mousemove', 'mouseup', 'click']
+	.forEach((m, i) => {
+	    app.two.surface.off(m);
+	    if (settings[i] && app.two[app.mode][m]) {
+		app.two.surface.on(m, app.two[app.mode][m]);
+	    }
+	})
+
+    console.log(app.three.controls);
+    ['enableZoom', 'enableRotate', 'enablePan']
+	.forEach((e, i) => {
+	    console.log(app.three.controls[e]);
+	    app.three.controls[e] = settings[i+4];
+	})
+}
+
 var menuActions = {
     'left' : function(){
 	var c = app.three.meshCenter()
@@ -17,142 +38,83 @@ var menuActions = {
 	var c = app.three.meshCenter()
 	app.three.camera.lookAt(c)
 	app.three.camera.position.set(c.x, 100, c.z)
+	app.three.camera.updateProjectionMatrix();
     },
     'bottom' : function(){
 	var c = app.three.meshCenter()
 	app.three.camera.lookAt(c)
 	app.three.camera.rotation.z = 90 * Math.PI / 180
 	app.three.camera.position.set(c.x, -100, c.z)
+	app.three.camera.updateProjectionMatrix();
     },
     'front' : function(){
 	var c = app.three.meshCenter()
 	app.three.camera.lookAt(c)
 	app.three.camera.position.set(c.x, c.y, -100)
+	app.three.camera.updateProjectionMatrix();
     },
     'back' : function(){
 	var c = app.three.meshCenter()
 	app.three.camera.lookAt(c)
 	app.three.camera.position.set(c.x, c.y, 100)
+	app.three.camera.updateProjectionMatrix();
     },
     'zoom to fit' : function(){
 	app.three.zoomToFit(0.9)
+	app.three.camera.updateProjectionMatrix();
     },
     'freehand' : function(){
         app.mode = 'freehand';
-        var mode = 'freehand'
-	
-        app.two.surface.off('mousedown');
-        app.two.surface.on('mousedown', app.two[mode].mousedown);
-        app.two.surface.off('mousemove');
-        app.two.surface.on('mousemove', app.two[mode].mousemove);
-        app.two.surface.off('mouseup');
-        app.two.surface.on('mouseup', app.two[mode].mouseup);
-        
-        app.three.controls.enableZoom = false;
-        app.three.controls.enableRotate = false;
-        app.three.controls.enablePan = false;             
+	setMode(app, [true, true, true, false, false, false, false])
     },
     'splines' : function(){
         app.mode = 'splines';
-        var mode = 'splines'
-	
-        app.two.surface.off('mousedown');
-        app.two.surface.on('mousedown', app.two[mode].mousedown);
-        app.two.surface.off('mousemove');
-        app.two.surface.on('mousemove', app.two[mode].mousemove);
-        app.two.surface.off('mouseup');
-        app.two.surface.on('mouseup', app.two[mode].mouseup);
-        
-        app.three.controls.enableZoom = false;
-        app.three.controls.enableRotate = false;
-        app.three.controls.enablePan = false;             
+	setMode(app, [true, true, true, false, false, false, false])
     },
     'straight lines' : function(){
         app.mode = 'polylines';
-        var mode = 'polylines'
-	
-        app.two.surface.off('mousedown');
-        app.two.surface.on('mousedown', app.two[mode].mousedown);
-        app.two.surface.off('mousemove');
-        app.two.surface.on('mousemove', app.two[mode].mousemove);
-        app.two.surface.off('mouseup');
-        app.two.surface.on('mouseup', app.two[mode].mouseup);
-        
-        app.three.controls.enableZoom = false;
-        app.three.controls.enableRotate = false;
-        app.three.controls.enablePan = false;             
+	setMode(app, [true, true, true, false, false, false, false])
     },
     '3d view' : function(){
 	app.mode = '3d';
+	setMode(app, [false, false, false, false, true, true, true])
 
 	app.two.clearCanvas();
-        app.two.surface.off('mousedown');
-        app.two.surface.off('mousemove');
-        app.two.surface.off('mouseup');
-
-        app.mode = 'threed';
-        var mode = 'threed'
-	
-        // app.two.surface.on('mousedown', app.two[mode].mousedown);
-	
-	console.log(app.scene);
-	app.three.controls.enableZoom = true;
-	app.three.controls.enableRotate = true;
-	app.three.controls.enablePan = true;		
-	
     },
-    'camera setup' : function(){
-	app.mode = 'camera';
+    'select' : function(){
+	app.mode = 'none';
 
-	app.two.clearCanvas();
-        app.two.surface.off('mousedown');
-        app.two.surface.off('mousemove');
-        app.two.surface.off('mouseup');
+	var c = app.three.meshCenter()
+	app.three.camera.lookAt(c)
+	app.three.camera.lookAt(0, 0, 0)
+	app.three.camera.position.set(-100, 0, 0)
+	app.three.camera.updateProjectionMatrix();
 
-        app.mode = 'camera';
-        var mode = 'camera'
-	
-        app.two.surface.on('mousedown', app.two[mode].mousedown);
-	
-	app.three.controls.enableZoom = false;
-	app.three.controls.enableRotate = false;
-	app.three.controls.enablePan = false;		
-	
+	setMode(app, [true, true, true, true, true, false, true])
     },
+
     'polylines' : function(){
 	app.mode = 'polylines';
-	var mode = 'polylines'
-
-	app.two.surface.off('mousedown');
-	app.two.surface.on('mousedown', app.two[mode].mousedown);
-	app.two.surface.off('mousemove');
-	app.two.surface.on('mousemove', app.two[mode].mousemove);
-	app.two.surface.off('mouseup');
-	app.two.surface.on('mouseup', app.two[mode].mouseup);
-	
-	app.three.controls.enableZoom = false;
-	app.three.controls.enableRotate = false;
-	app.three.controls.enablePan = false;		
+	setMode(app, [true, true, true, false, false, false, false])
     },
     'edit splines' : function(){
-	// app.two.editLine()
 	app.mode = 'svg';
-	var mode = 'svg'
-
-	app.two.surface.off('mousedown');
-	app.two.surface.on('mousedown', app.two[mode].mousedown);
-	app.two.surface.off('mousemove');
-	app.two.surface.on('mousemove', app.two[mode].mousemove);
-	app.two.surface.off('mouseup');
-	app.two.surface.on('mouseup', app.two[mode].mouseup);
-
-	app.three.controls.enableZoom = true;
-	app.three.controls.enableRotate = false;
-	app.three.controls.enablePan = true;		
+	setMode(app, [true, true, true, true, true, false, true])
     },
-    'vectorize' : function(){
-	app.two.vectorize()
+    'edit splines zoom' : function(){
+	app.mode = 'svgzoom';
+	setMode(app, [true, true, true, true, true, false, true])
     },
+    'distort geometry' : function(){
+	app.mode = 'svgzoom';
+	setMode(app, [true, true, true, true, true, false, false])
+    },
+    'get handles' : function(){
+	app.mode = 'morph';
+	setMode(app, [true, true, true, true, true, false, false])
+    },
+
+
     'get image' : function(){
 	console.log(app.two.toCanvas())
     },
@@ -161,6 +123,19 @@ var menuActions = {
     },
     'paste vector' : function(){
 	console.log(app.two.pasteSVG())
+    },
+
+    'camera setup' : function(){
+	app.mode = 'camera';
+
+	app.two.clearCanvas();
+        app.two.surface.off('mousedown');
+        app.two.surface.off('mousemove');
+        app.two.surface.off('mouseup');
+	
+	app.three.controls.enableZoom = false;
+	app.three.controls.enableRotate = false;
+	app.three.controls.enablePan = false;		
     },
 };
 
@@ -216,7 +191,7 @@ var setUpDocumentMenuListener = function(){
 		console.log(e)
 	    }
 	} else {
-	    console.log(`item ${v} is not connected to an action`)
+	    console.log( `item ${v} is not connected to an action` )
 	}
     })
 }
@@ -237,7 +212,7 @@ $(function(){
 	.then(a => {
 	    return a.map(d => {
 		// console.log(d.destination);
-		$(d.destination).html(d.component)
+		$(d.destination).append(d.component)
 		return d.destination
 	    })
 	})
@@ -258,6 +233,7 @@ $(function(){
 
     $('#sidemenu img').on('click', function(e) {
 	var v  = $(e.target).data('command')
+	console.log(v);
 	if (menuActions[v]) {
 	    try {
 		menuActions[v]();
