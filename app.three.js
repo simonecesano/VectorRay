@@ -1,4 +1,4 @@
-var intersectionWorker = new Worker( '/intersectionWorker.js' )
+var intersectionWorker = new Worker( './intersectionWorker.js' )
 
 
 var getNormalizedPoint = function(e) {
