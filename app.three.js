@@ -1,3 +1,29 @@
+var intersectionWorker = new Worker( '/intersectionWorker.js' )
+
+
+var getNormalizedPoint = function(e) {
+    var r = e.target.getBoundingClientRect();
+    
+    var p = {}, m = {};
+    
+    p.x = e.clientX - r.x;
+    p.y = e.clientY - r.y;
+    
+    m.x =     (p.x) / e.target.clientWidth  * 2 - 1;
+    m.y = 1 - (p.y) / e.target.clientHeight * 2;
+
+    return m;
+}
+
+var getNormalizedSVGPoint = function(p, svg) {
+    var m = {};
+    
+    m.x =     (p.x) / svg.clientWidth  * 2 - 1;
+    m.y = 1 - (p.y) / svg.clientHeight * 2;
+    
+    return m;
+}
+
 var makePencil = function(t) {
     var shape = new THREE.Shape();
     shape.moveTo( 0, t );
@@ -10,31 +36,39 @@ var makePencil = function(t) {
 
 
 App.Three = class {
-    constructor(app, webGLElement){
+    constructor(app, webGLElement, opts){
 	this.app = app;
 
-	const canvasEl = (('OffscreenCanvas' in window) && false) ?
-	      webGLElement.querySelector('canvas').transferControlToOffscreen()
-	      : webGLElement.querySelector('canvas');
+	// console.log(Object.getPrototypeOf(webGLElement));
+	// console.log(webGLElement.constructor.name === "HTMLCanvasElement");
 
-	// const worker = new Worker('worker.js');
-	// worker.postMessage({ canvas: canvasEl }, [canvasEl]);
-
-	console.log(canvasEl);
-	// console.log(('OffscreenCanvas' in window))
-
-	canvasEl.style = { width: webGLElement.clientWidth, height: webGLElement.clientHeight }
-
-	// const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+	var size;
+	if (webGLElement.constructor.name === "HTMLCanvasElement") {
+	    size = {
+		width: webGLElement.parentNode.clientWidth,
+		height: webGLElement.parentNode.clientHeight
+	    }
+	    webGLElement.style = {
+		width: webGLElement.parentNode.clientWidth,
+		height: webGLElement.parentNode.clientHeight
+	    }
+	} else {
+	    size = {
+		width: opts.width,
+		height: opts.width
+	    }
+	    webGLElement.style = { width: opts.width, height: opts.height }
+	}
 
 	this.scene    = new THREE.Scene();
 
-	this.renderer = new THREE.WebGLRenderer( { canvas: canvasEl, antialias: true, alpha: true, preserveDrawingBuffer: true } );
+	this.renderer = new THREE.WebGLRenderer( { canvas: webGLElement, antialias: true, alpha: true, preserveDrawingBuffer: true } );
 
+	// console.log(this.renderer.constructor.name);
+	
 	this.renderer.setPixelRatio( window.devicePixelRatio );
 	this.renderer.setClearColor( 0x000000, 0 )
-	this.renderer.setSize( webGLElement.clientWidth, webGLElement.clientHeight );
-
+	this.renderer.setSize( size.width, size.height );
 	
 	// webGLElement.appendChild( this.renderer.domElement );
 
@@ -54,6 +88,7 @@ App.Three = class {
 	this.loader = new THREE.OBJLoader();
 
 	this.pencil = makePencil(0.1);
+
     }
 
 
@@ -69,53 +104,72 @@ App.Three = class {
     
     get animate() {
     	var app = this;
-    	var f = function animate() { requestAnimationFrame( animate ); app.controls.update(); app.render() }
+	
+    	var f = function animate() {
+	    if ( self.requestAnimationFrame ) {
+		self.requestAnimationFrame( animate );
+	    }
+	    app.controls.update();
+	    app.render()
+	}
     	return f
     }
 }
 
+App.Three.prototype.loadObj = function(obj) {
+    var three = this;
+    var geometry = three.loader.parse(obj)
+    var material = three.defaultMaterial;
+
+    geometry.traverse(function(child) {
+	if (child instanceof THREE.Mesh) {
+	    child.geometry.computeBoundingBox();
+	    // child.geometry.computeBoundingSphere();
+	    child.material = material.clone()
+	} });
+    
+    geometry.scale.set( 100, 100, 100 );
+    
+    three.mesh = geometry;
+    var t = three.meshCenter();
+    
+    console.log(t);
+    geometry.translateX(-t.x)
+    geometry.translateY(-t.y)
+    geometry.translateZ(-t.z);
+    
+    three.scene.add( three.mesh );
+    
+    three.zoomToFit();
+    return three.mesh;
+}
+
+App.Three.prototype.getObjfromCache = function() {
+
+}
+
+App.Three.prototype.putObjinCache = function(obj, name) {
+
+}
+
+
 App.Three.prototype.load = function(file){
     console.log('loading');
-    console.log(file);
+    // console.log(file);
 
     var three = this;
 
-    console.log(this);
+    // console.log(this);
     
     var material = three.defaultMaterial;
     var reader = new FileReader();
     
     reader.onload = function(e, clearmeshes, callback) {
 	var geometry, face;
-
-	console.log(e);
 	var obj = e.target.result;
 
-	console.log(obj.length);
+	three.loadObj(obj);
 
-	var geometry = three.loader.parse(obj)
-	geometry.traverse(function(child) {
-	    if (child instanceof THREE.Mesh) {
-		child.geometry.computeBoundingBox();
-		child.geometry.computeBoundingSphere();
-		child.material = material.clone()
-	    } });
-	
-	geometry.scale.set( 100, 100, 100 );
-
-	three.mesh = geometry;
-	var t = three.meshCenter();
-	
-	
-	geometry.translateX(-t.x);
-	geometry.translateY(-t.y);
-	geometry.translateZ(-t.z);
-
-	
-	three.scene.add( three.mesh );
-
-	three.zoomToFit();
-	
 	three.app.db.objects
 	    .put({name: 'obj', obj: three.mesh.toJSON() })
 	    .then(e => {
@@ -126,6 +180,11 @@ App.Three.prototype.load = function(file){
 	    }).catch(function(error) {
 		alert ("Ooops: " + error);
 	    });
+	
+	intersectionWorker.postMessage({
+	    type: 'init',
+	    scene: three.scene.toJSON(),
+	})
     }
     reader.readAsBinaryString(file);
 };
@@ -155,15 +214,29 @@ App.Three.prototype.addShadowedLight = function ( x, y, z, color, intensity ) {
 }
 
 App.Three.prototype.project3Dto2D = function(vector, camera){
+    camera = camera ? camera : this.camera;
+
     var three = this;
     var v = vector.clone();
     v.project( camera );
 
     // map to 2D screen space
+
     v.x = Math.round( (   v.x + 1 ) * three.element.offsetWidth  / 2 );
     v.y = Math.round( ( - v.y + 1 ) * three.element.offsetHeight / 2 );
     v.z = 0;
     return v;
+}
+
+App.Three.prototype.project3DtoSVG = function(vector, camera){
+    camera = camera ? camera : this.camera;
+    
+    const p = this.project3Dto2D(vector, camera);
+    var m = this.app.two.canvas.node.getCTM()
+    var s = this.app.two.surface.node.createSVGPoint()
+    s.x = p.x; s.y = p.y;
+    s = s.matrixTransform(m.inverse())
+    return s;
 }
 
 App.Three.prototype.getCorners = function() {
@@ -188,6 +261,8 @@ App.Three.prototype.getBoundingSphere = function() {
 
 App.Three.prototype.bbox2D = function(){
     var three = this;
+    if (!three.camera) { throw("camera is not defined") }
+    
     var p = three.getCorners()
 	.map(e => {
 	    return three.project3Dto2D(e, three.camera);
@@ -220,7 +295,8 @@ App.Three.prototype.zoomToFit = function(f){
 	this.camera.zoom = z * f;
 	this.zoomBase = this.camera.zoom;
 	this.panBase = this.camera.position.clone();
-
+	// this.app.two.panZoom.zoom(this.camera.zoom);
+	
 	this.camera.updateProjectionMatrix();
     } else {
     }
@@ -245,6 +321,39 @@ App.Three.prototype.centerObject = function(){
     three.mesh.translateZ(-t.z);
 }
 
+App.Three.prototype.makeExtrusionFromPoints = function(intersections, length, svg, camera) {
+    var pencil = this.pencil;
+    
+    var curve = new THREE.CatmullRomCurve3(intersections);
+    
+    var extrudeSettings = {
+	steps: Math.floor(length / 2),
+	bevelEnabled: false,
+	extrudePath: curve
+    };
+    
+    var geometry = new THREE.ExtrudeGeometry( pencil, extrudeSettings );
+    
+    var color = new THREE.Color("rgb(0, 0, 0)");
+    var material = new THREE.MeshBasicMaterial( { color: color } );
+    var mesh = new THREE.Mesh( geometry, material ) ;
+
+    mesh.name = 'VectorRayLine_' + Math.floor(Math.random() * 100)
+    mesh.userData.svg    = svg;
+    mesh.userData.camera = JSON.stringify(camera);
+    
+    this.scene.add( mesh );
+
+    return mesh
+}
+
+App.Three.prototype.makeExtrusionFromPointsPromise = function(intersections, length, svg, camera) {
+    var three = this
+    return (new Promise(function(resolve, reject) {
+	resolve(three.makeExtrusionFromPoints(intersections, length, svg, camera))
+    }))
+}
+
 App.Three.prototype.extrusionFromPath = function(shape){
     var draw = this;
     var app = this.app;
@@ -258,9 +367,6 @@ App.Three.prototype.extrusionFromPath = function(shape){
 
     var startTime = new Date();
     
-    console.log('start ' + (new Date()));
-    console.log('line length ' + shape.node.getTotalLength());
-
     var p = [];
     for ( let i = 0; i < shape.node.getTotalLength(); i += 2) {
 	var k = shape.node
@@ -268,64 +374,35 @@ App.Three.prototype.extrusionFromPath = function(shape){
 	    .matrixTransform(matrix)
 	p.push(k);
     }
-    
-    console.log('start ' + (new Date()));
-    Promise.all(p.map(e => {
-	return (new Promise(function(resolve, reject){
-	    resolve(draw.getIntersectingFace(e))
-	}))
-    })).then( e => {
-	return e.filter(e => {
-	    return e.faceIndex
-	}).map(e => {
-	    return e.point;
-	})
-    }).then( intersections => {
-	var pencil = this.pencil;
-	var curve = new THREE.CatmullRomCurve3(intersections);
 
-	var extrudeSettings = {
-	    steps: shape.node.getTotalLength() * 2,
-	    bevelEnabled: false,
-	    extrudePath: curve
-	};
-	
-	var geometry = new THREE.ExtrudeGeometry( pencil, extrudeSettings );
-	geometry.computeFaceNormals();
-	geometry.computeBoundingSphere();
-	
-	var color = new THREE.Color("rgb(0, 0, 0)");
-	var material = new THREE.MeshBasicMaterial( { color: color } );
-	var mesh = new THREE.Mesh( geometry, material ) ;
-
-	mesh.name = 'VectorRayLine_' + Math.floor(Math.random() * 100)
-	mesh.userData.svg    = shape.node.outerHTML;
-	mesh.userData.camera = JSON.stringify(camera);
-	app.three.scene.add( mesh );
-	
-	shape.remove()
-	return mesh
-    }).then(e => {
-	// console.log(e);
-	var endTime = new Date();
-
-	console.log('drawn ' + (new Date()));
-	console.log("total time " + (endTime.getTime() - startTime.getTime()));
-	console.log("segments per sec " + (totLen / (endTime.getTime() - startTime.getTime())));
-    }).catch(e => {
-	console.log(e)
+    var rays = p.map(e => {
+	var n = draw.getNormalizedCoords(e);
+	draw.raycaster.setFromCamera( n, app.three.camera );
+	return draw.raycaster.ray.clone();
     })
+
+    intersectionWorker.postMessage({
+    	action:     'intersect',
+    	svg:        shape.node.outerHTML,
+	id:         shape.attr('id'),
+    	length:     shape.node.getTotalLength(),
+    	camera:     camera.toJSON(),
+    	origins:    rays.map(r => r.origin.toArray() ),
+    	directions: rays.map(r => r.direction.toArray())
+    })
+    console.log('start ' + (new Date()));
 }
 
-
-App.Three.prototype.getIntersectingFace = function(p1, all) {
+App.Three.prototype.getNormalizedCoords = function(p1) {
     var m1 = {};
     var p = {};
+
+    // console.log(p1.constructor == SVGPoint);
+    // console.log(p1.hasOwnProperty('originalEvent'))
 
     var app = this.app;
     
     var webGLelement = app.three.element;
-    var raycaster = app.three.raycaster;
 
     if (typeof p1.clientX !== 'undefined') {
 	var r = webGLelement.getBoundingClientRect()
@@ -336,32 +413,70 @@ App.Three.prototype.getIntersectingFace = function(p1, all) {
 	p.y = p1.y
     }
     
-    m1.x =     (p.x) / $(webGLelement).width()  * 2 - 1;
-    m1.y = 1 - (p.y) / $(webGLelement).height() * 2;
-    raycaster.setFromCamera( m1, app.three.camera );
-    var intersects = raycaster.intersectObjects( [ app.three.mesh ], true );
+    m1.x =     (p.x) / webGLelement.clientWidth  * 2 - 1;
+    m1.y = 1 - (p.y) / webGLelement.clientHeight * 2;
+    return m1;
+}
 
+App.Three.prototype.getIntersectingFaceGPU = function(p1, list, all) {
+    p1 = arguments[0];
+
+    this.gpuPicker.setScene(this.scene);
+    this.gpuPicker.setCamera(this.camera);
+
+    
+    all = Array.isArray(list) ? arguments[2] : arguments[1];
+    list = Array.isArray(list) ? arguments[1] : this.scene.children;
+    
+    var m1 = this.getNormalizedCoords(p1);
+    // console.log(p1, m1, all, list)
+    var raycaster = this.raycaster;
+
+    raycaster.setFromCamera( m1, this.camera );
+
+    var intersect = this.gpuPicker.pick(m1, raycaster);
+
+    console.log(intersect);
+    
+}
+
+App.Three.prototype.getIntersectingFace = function(p1, list, all) {
+    p1 = arguments[0];
+
+    all = Array.isArray(list) ? arguments[2] : arguments[1];
+    list = Array.isArray(list) ? arguments[1] : this.scene.children;
+    
+    var m1 = this.getNormalizedCoords(p1);
+    // console.log(p1, m1, all, list)
+    var raycaster = this.raycaster;
+
+    raycaster.setFromCamera( m1, this.camera );
+    
+    var intersects = raycaster.intersectObjects( list, true );
+    
     if (intersects.length) {
-	if (all) {
-	    return intersects;
-	} else {
-	    return intersects[0];
-	}
+	return all ? intersects : intersects[0] 
     } else {
-	return false
+	return all ? [] : undefined;
     }
 }
 
-App.Three.prototype.vectorize = function(distanceTolerance, catmullRomFactor) {
+
+// this is probably causing a mess now
+App.Three.prototype.vectorizeAll = function(distanceTolerance, catmullRomFactor){
+
+}
+
+App.Three.prototype.vectorize = function(lines, distanceTolerance, catmullRomFactor) {
     var app = this.app;
     var draw = app.two;
-    var c = this.meshLines();
 
-
+    // console.log(lines);
     
     distanceTolerance = distanceTolerance || 0.7;
     
-    c.forEach(e => {
+    lines.forEach(e => {
+
 	var p = e.geometry.parameters.options.extrudePath;
 	var l = p.getLength();
 	var s = 0.5 * 1 / l;
@@ -397,9 +512,9 @@ App.Three.prototype.vectorize = function(distanceTolerance, catmullRomFactor) {
 	    var v2 = r.point2D
 	    var d = Math.abs(r.pointDistance - r.intersectionDistance);
 	    if (d <= distanceTolerance) {
-	    	app.two.canvas.circle(10).fill('#8B0000').attr({ cx: v2.x, cy: v2.y, 'data-distance': d, class: 'vectorize' })
+	    	// app.two.canvas.circle(10).fill('#8B0000').attr({ cx: v2.x, cy: v2.y, 'data-distance': d, class: 'vectorize' })
 	    } else {
-	    	app.two.canvas.circle(10).fill('#FF8C00').attr({ cx: v2.x, cy: v2.y, 'data-distance': d, class: 'vectorize' })
+	    	// app.two.canvas.circle(10).fill('#FF8C00').attr({ cx: v2.x, cy: v2.y, 'data-distance': d, class: 'vectorize' })
 	    }
 	})
 
