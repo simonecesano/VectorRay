@@ -8,22 +8,18 @@ const option = {
 App.Two = class {
     constructor(app, svgElement){
 	this.app = app;
-	// console.log(svgElement);
 
 	this.surface = SVG(svgElement.getAttribute('id'))
 
 	
 	this.surface.attr('viewBox', [0, 0, svgElement.clientWidth, svgElement.clientHeight].join(' '))
-	// console.log(this.canvas.node.outerHTML);
-	// console.log(svgElement.clientWidth, svgElement.clientHeight);
-	// this.canvas.size(svgElement.clientWidth, svgElement.clientHeight);
-	
-	// console.log(this.canvas.node);
 
 	this.element = svgElement
 	this.canvas = this.surface.group()
 
-	this.canvas.rect(40, 40).move(600, 180)
+	this.canvas.rect(40, 40).move(500, 180)
+	    .attr('fill', 'yellow').attr('stroke', 'lightgray')
+
 	this.panZoom = svgPanZoom(this.surface.node,
 				  {
 				      viewportSelector: this.canvas,
@@ -33,9 +29,6 @@ App.Two = class {
 				      minZoom: 0.001,
 				      maxZoom: 1000
 				  });
-	
-	// console.log(this.panZoom);
-	// console.log(this.surface.node);
 	
 	this.shapes = []
 	this.index = 0;
@@ -102,33 +95,31 @@ App.Two = class {
 	var shapes = this.shapes;
 	
 	return {
+	    click: event => {},
 	    mousedown: event => {
-    		if (app.mode !== 'freehand') return;
+    		// if (app.mode !== 'freehand') return;
     		event.stopPropagation();
     		const shape = draw.canvas.polyline().attr(option);
-		// console.log(shape);
-		
 		shape.on('drawstart', function(e){ });
-		
     		shapes[draw.index] = shape;
     		shape.draw(event);
 	    },
 	    mousemove: event => {
-    		if (app.mode !== 'freehand') return;
-    		// if (!p.ctrlKey) return
+    		// if (app.mode !== 'freehand') return;
     		if (!shapes[draw.index]) return;
     		shapes[draw.index].draw('point', event);
 	    },
 	    mouseup: event => {
-    		if (app.mode !== 'freehand') return;
+    		// if (app.mode !== 'freehand') return;
     		try {
     		    shapes[draw.index].draw('stop', event);
 		    // console.log(shapes[draw.index]);
 		    var reduced = shapes[draw.index].toCatmullRom();
+		    shapes[draw.index].remove();
+
 		    reduced.simplify()
 		    reduced.attr('stroke', 'black').attr('stroke-width', 2).attr('fill', 'none')
 		    app.three.extrusionFromPath(reduced);
-		    shapes[draw.index].remove();
     		    draw.index++;
     		} catch(e) {
     		    console.log(e);
@@ -173,8 +164,55 @@ App.Two = class {
 		var svg = SVG.adopt($(event.target).get(0));
 		console.log(svg);
 	    },
+	    click: event => {},
 	    mouseup: event => {},
 	    mousemove: event => {},
+	}
+    }
+    get svgzoom(){
+	var draw = this;
+	var app = this.app;
+	var shapes = this.shapes;
+	return {
+	    mousedown: event => {
+	    },
+	    mouseup: event => {},
+	    mousemove: event => {},
+	    click: event => {
+		console.log('svg click');
+		console.log(event);
+		var i = app.three.getIntersectingFace(event, true)
+		    .filter(e => { return e.object.userData.svg })
+		    .map(e => e.object);
+		app.three.vectorize(i) 
+	    },
+	}
+    }
+    get morph(){
+	var draw = this;
+	var app = this.app;
+	var shapes = this.shapes;
+	var events = this.freehand;
+	console.log(events);
+	events.mouseup = function(event){
+    	    shapes[draw.index].draw('stop', event);
+	    
+	    var reduced = shapes[draw.index].toCatmullRom();
+	    shapes[draw.index].remove();
+	    reduced.simplify()
+	    reduced.attr('stroke', 'black').attr('stroke-width', 2).attr('fill', 'none')
+	    reduced.attr('class', 'reference');
+	    reduced.attr('id', 'hullcurve');
+	    var len =   reduced.node.getTotalLength()
+	}
+	return events;
+    }
+    get none(){
+	return {
+	    mousedown:  event => {},
+	    mouseup:    event => {},
+	    mousemove:  event => {},
+	    mouseclick: event => {},
 	}
     }
 }
@@ -243,6 +281,12 @@ App.Two.prototype.clearCanvas = function(){
 }
 
 
+App.Two.prototype.createSVGPoint = function (v) {
+    var p = this.surface.node.createSVGPoint()
+    p.x = v.x; p.y = v.y
+    return p;
+};
+
 App.Two.prototype.unproject = function(vector3d, transform) {
     var app = this.app;
 
@@ -269,7 +313,7 @@ App.Two.prototype.drawCatmullRom = function (data,alpha) {
     var draw = this;
     var app = this.app;
 
-    console.log(data);
+    // console.log(data);
     
     var element = this.canvas.path()
 	.fromPoints(data)
