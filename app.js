@@ -1,8 +1,10 @@
 const App = class {
-    constructor(webGLElement, svgElement){
-	this.three = new App.Three(this, webGLElement);
-	this.two = new App.Two(this, svgElement);
-	this.ui  = new App.UI(this, webGLElement, svgElement);
+    constructor(webGLElement, svgElement, opts){
+
+	this.three = new App.Three(this, webGLElement, opts);
+	this.two = new App.Two(this, svgElement, opts);
+	this.ui  = new App.UI(this, webGLElement, svgElement, opts);
+
 	var db = new Dexie("vectorray");
 
 	db.version(1).stores({
